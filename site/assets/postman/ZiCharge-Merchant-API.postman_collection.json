@@ -1,0 +1,334 @@
+{
+  "info": {
+    "name": "ZiCharge Merchant API",
+    "description": "Complete Postman collection for the ZiCharge Merchant Payment Gateway. Covers Deposit (Initiate Payment, Validate Payment) and Withdrawal (Cashback, Validate Payment) flows.\n\nSet the collection variables before running:\n- `base_url` — use `https://dev.zicharge.com` for sandbox or `https://secure.zicharge.com` for production\n- `merchant_mobile_no` — your provisioned merchant wallet number\n- `store_password` — your provisioned store password\n- `ipn_url` — your publicly accessible IPN listener endpoint",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "zicharge-merchant-api-v1"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://dev.zicharge.com",
+      "description": "Base URL. Use https://dev.zicharge.com for sandbox, https://secure.zicharge.com for production."
+    },
+    {
+      "key": "merchant_mobile_no",
+      "value": "+9647712345678",
+      "description": "Your provisioned merchant wallet number (E.164 format)."
+    },
+    {
+      "key": "store_password",
+      "value": "your-store-password",
+      "description": "Your provisioned store password. Never expose this client-side."
+    },
+    {
+      "key": "ipn_url",
+      "value": "https://yoursite.com/webhooks/zicharge/ipn",
+      "description": "Your publicly accessible IPN listener endpoint (HTTPS only)."
+    },
+    {
+      "key": "order_id",
+      "value": "ORD-2026-000001",
+      "description": "Your unique order ID. Reusing the same order_id will not double-charge."
+    },
+    {
+      "key": "customer_mobile_no",
+      "value": "+9647701234567",
+      "description": "The customer's ZiCharge wallet number (E.164 format)."
+    }
+  ],
+  "item": [
+    {
+      "name": "Deposit",
+      "description": "Collect payments from customer ZiCharge wallets. Use Initiate Payment to mint a token, redirect the customer to checkout, receive an IPN callback, then Validate Payment to confirm.",
+      "item": [
+        {
+          "name": "Initiate Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"merchant_mobile_no\": \"{{merchant_mobile_no}}\",\n  \"store_password\": \"{{store_password}}\",\n  \"order_id\": \"{{order_id}}\",\n  \"bill_amount\": 5000,\n  \"success_url\": \"https://yoursite.com/orders/success\",\n  \"cancel_url\": \"https://yoursite.com/orders/cancel\",\n  \"ipn_url\": \"{{ipn_url}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/merchant/generate-payment-token",
+              "host": ["{{base_url}}"],
+              "path": ["merchant", "generate-payment-token"]
+            },
+            "description": "Mints a payment token for a given order. Returns a `payment_token` and a `redirect_url` to send the customer to the hosted checkout page.\n\n**After this call:**\nRedirect the customer to `redirect_url`. The token is valid for 15 minutes."
+          },
+          "response": [
+            {
+              "name": "Success — token minted",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 200,\n  \"messages\": [\"Token generated successfully.\"],\n  \"data\": {\n    \"payment_token\": \"tok_a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4\",\n    \"redirect_url\": \"https://secure.zicharge.com/merchant/payment?token=tok_a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4\",\n    \"order_id\": \"ORD-2026-000001\",\n    \"expires_in_seconds\": 900\n  }\n}"
+            },
+            {
+              "name": "Error — duplicate order_id",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 409,\n  \"messages\": [\"Order ID already exists.\"],\n  \"data\": null\n}"
+            },
+            {
+              "name": "Error — invalid credentials",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 401,\n  \"messages\": [\"Authentication failed.\"],\n  \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "IPN Callback (Incoming — reference only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              },
+              {
+                "key": "X-ZiCharge-Signature",
+                "value": "<hmac-sha256-hex>",
+                "description": "HMAC-SHA256 of the raw request body using your IPN secret."
+              },
+              {
+                "key": "X-ZiCharge-Timestamp",
+                "value": "1716192000",
+                "description": "Unix epoch seconds at dispatch time."
+              },
+              {
+                "key": "X-ZiCharge-Request-Id",
+                "value": "req_abc123xyz",
+                "description": "Opaque ID for deduplication and support correlation."
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "transaction_id", "value": "123456" },
+                { "key": "order_id", "value": "ORD-2026-000001" },
+                { "key": "bill_amount", "value": "5000" },
+                { "key": "customer_account_no", "value": "+9647701234567" },
+                { "key": "status", "value": "Success" },
+                { "key": "received_at", "value": "2026-05-20 10:00:00" },
+                { "key": "ipn", "value": "1" }
+              ]
+            },
+            "url": {
+              "raw": "{{ipn_url}}",
+              "host": ["{{ipn_url}}"]
+            },
+            "description": "This request is sent BY ZiCharge TO your IPN listener — not a call you make outbound.\n\nThis entry is provided as a reference so you can use Postman to simulate an IPN delivery against your local listener during development.\n\n**Your listener must:**\n1. Verify the HMAC-SHA256 signature against the raw body\n2. Check timestamp drift (reject if > 5 minutes old)\n3. Deduplicate on X-ZiCharge-Request-Id\n4. Persist the IPN record\n5. Return HTTP 200 ONLY after persistence"
+          },
+          "response": [
+            {
+              "name": "Acknowledged",
+              "status": "OK",
+              "code": 200,
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "Validate Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"merchant_mobile_no\": \"{{merchant_mobile_no}}\",\n  \"store_password\": \"{{store_password}}\",\n  \"order_id\": \"{{order_id}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/merchant/payment/validation",
+              "host": ["{{base_url}}"],
+              "path": ["merchant", "payment", "validation"]
+            },
+            "description": "Confirms the final status of a payment after receiving an IPN callback. Returns the canonical `transaction_id` to record in your books.\n\nThis endpoint is read-only and safe to call multiple times."
+          },
+          "response": [
+            {
+              "name": "Success — payment confirmed",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 200,\n  \"messages\": [\"Successfully Deposited.\"],\n  \"data\": {\n    \"transaction_id\": 123456,\n    \"order_id\": \"ORD-2026-000001\",\n    \"bill_amount\": \"5000\",\n    \"customer_account_no\": \"+9647701234567\",\n    \"status\": \"Success\",\n    \"received_at\": \"2026-05-20 10:00:00\"\n  }\n}"
+            },
+            {
+              "name": "Not paid — cancelled or pending",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 200,\n  \"messages\": [\"Payment not completed.\"],\n  \"data\": {\n    \"order_id\": \"ORD-2026-000001\",\n    \"status\": \"Cancelled\"\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Withdrawal",
+      "description": "Push credits from your merchant wallet to a customer ZiCharge wallet. Use Cashback to initiate the transfer, then Validate Payment to confirm the transaction record.",
+      "item": [
+        {
+          "name": "Cashback",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"merchant_mobile_no\": \"{{merchant_mobile_no}}\",\n  \"store_password\": \"{{store_password}}\",\n  \"customer_mobile_no\": \"{{customer_mobile_no}}\",\n  \"amount\": 1000,\n  \"order_id\": \"CB-2026-000001\",\n  \"remarks\": \"Refund for order ORD-2026-000001\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/merchant/payment/cashback",
+              "host": ["{{base_url}}"],
+              "path": ["merchant", "payment", "cashback"]
+            },
+            "description": "Pushes a credit from your merchant wallet to a customer ZiCharge wallet. Settled synchronously — the customer's wallet balance is updated in the same response.\n\nUse for refunds, loyalty credits, and promotional disbursements.\n\nMinimum amount: 250 IQD."
+          },
+          "response": [
+            {
+              "name": "Success — credit applied",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 200,\n  \"messages\": [\"Cashback sent successfully.\"],\n  \"data\": {\n    \"transaction_id\": 789012,\n    \"order_id\": \"CB-2026-000001\",\n    \"amount\": \"1000\",\n    \"customer_mobile_no\": \"+9647701234567\",\n    \"status\": \"Success\",\n    \"received_at\": \"2026-05-20 10:05:00\"\n  }\n}"
+            },
+            {
+              "name": "Error — insufficient merchant balance",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 422,\n  \"messages\": [\"Insufficient merchant balance.\"],\n  \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Validate Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"merchant_mobile_no\": \"{{merchant_mobile_no}}\",\n  \"store_password\": \"{{store_password}}\",\n  \"order_id\": \"CB-2026-000001\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/merchant/payment/validation",
+              "host": ["{{base_url}}"],
+              "path": ["merchant", "payment", "validation"]
+            },
+            "description": "Confirms the status of a cashback transaction by order ID. Returns the canonical `transaction_id`.\n\nThis endpoint is read-only and safe to call multiple times."
+          },
+          "response": [
+            {
+              "name": "Success — cashback confirmed",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 200,\n  \"messages\": [\"Cashback confirmed.\"],\n  \"data\": {\n    \"transaction_id\": 789012,\n    \"order_id\": \"CB-2026-000001\",\n    \"amount\": \"1000\",\n    \"customer_mobile_no\": \"+9647701234567\",\n    \"status\": \"Success\",\n    \"received_at\": \"2026-05-20 10:05:00\"\n  }\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

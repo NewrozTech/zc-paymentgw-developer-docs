@@ -73,11 +73,15 @@ markdown_extensions:
 
 nav:
   - Home: index.md
-  - Overview: 01-overview.md
+  - API Explorer: api-explorer.md
+  - Deposit:
+    - Initiate Payment: deposit/initiate-payment.md
+    - IPN Callback: deposit/ipn-callback.md
+    - Validate Payment: deposit/validate-payment.md
+  - Withdrawal:
+    - Cashback: withdrawal/cashback.md
+    - Validate Payment: withdrawal/validate-payment.md
   - Authentication & Security: 02-authentication.md
-  - Payment Flow: 03-payment-flow.md
-  - API Reference: 04-api-reference.md
-  - IPN Callbacks: 05-ipn-callbacks.md
   - Error Codes: 06-error-codes.md
   - Testing & Go-Live: 07-testing-and-go-live.md
   - Platform Notes: 08-migration-notes.md

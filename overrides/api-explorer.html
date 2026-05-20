@@ -1,0 +1,83 @@
+{% extends "main.html" %}
+
+{% block styles %}
+{{ super() }}
+<style>
+  .zi-explorer-wrap {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 48px);
+    overflow: hidden;
+  }
+  .zi-explorer-notice {
+    background: #0d1e3a;
+    color: rgba(255,255,255,0.75);
+    font-size: 0.78rem;
+    padding: 0.45rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    flex-shrink: 0;
+  }
+  .zi-explorer-notice strong { color: #00c896; }
+  rapi-doc {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    --green: #00b386;
+    --blue: #1b6ca8;
+    --font-size-regular: 14px;
+  }
+</style>
+{% endblock %}
+
+{% block tabs %}{{ super() }}{% endblock %}
+
+{% block content %}
+<div class="zi-explorer-wrap">
+  <div class="zi-explorer-notice">
+    <strong>Sandbox mode:</strong>&nbsp;Select the Sandbox server in the explorer to test without moving real funds.
+    &nbsp;|&nbsp; All calls must be made <strong>server-side</strong> — never expose your <code>store_password</code> in client code.
+  </div>
+  <rapi-doc
+    id="zi-rapidoc"
+    spec-url="../assets/openapi.yaml"
+    theme="light"
+    bg-color="#ffffff"
+    text-color="#0A1628"
+    header-color="#0A1628"
+    primary-color="#1B6CA8"
+    nav-bg-color="#0D1E3A"
+    nav-text-color="rgba(255,255,255,0.75)"
+    nav-hover-bg-color="#1B3D6F"
+    nav-hover-text-color="#ffffff"
+    nav-accent-color="#00B386"
+    nav-item-spacing="relaxed"
+    render-style="read"
+    schema-style="tree"
+    schema-description-expanded="true"
+    default-schema-tab="example"
+    response-area-height="400px"
+    show-header="false"
+    allow-try="true"
+    allow-server-selection="true"
+    server-url="https://dev.zicharge.com"
+    show-components="false"
+    show-info="true"
+    allow-authentication="false"
+    sort-tags="false"
+    sort-endpoints-by="none"
+    goto-path="/"
+  >
+    <div slot="nav-logo" style="display:flex;align-items:center;padding:1rem 1rem 0.5rem;gap:0.6rem;">
+      <span style="font-size:1.05rem;font-weight:700;color:#fff;letter-spacing:-0.01em;">ZiCharge</span>
+      <span style="font-size:0.72rem;background:#00b386;color:#fff;padding:2px 7px;border-radius:20px;font-weight:600;">API</span>
+    </div>
+  </rapi-doc>
+</div>
+<script type="module" src="https://unpkg.com/rapidoc@9.3.4/dist/rapidoc-min.js"></script>
+{% endblock %}
+
+{% block sidebar %}{% endblock %}
+{% block toc %}{% endblock %}

@@ -1,0 +1,403 @@
+openapi: 3.0.3
+
+info:
+  title: ZiCharge Merchant API
+  version: "1.0"
+  description: |
+    Accept payments from ZiCharge wallet holders and push cashback credits to customer wallets.
+
+    ## Authentication
+
+    Pass `merchant_mobile_no` and `store_password` in every request body. These credentials are
+    provisioned at merchant onboarding — contact **integrations@zicharge.com** to get started.
+
+    > **Security note:** All API calls must be made server-side. Never expose `store_password` in
+    > client-side code, browser requests, or mobile apps.
+
+    ## Response format
+
+    Every endpoint returns **HTTP 200** regardless of the logical outcome. Always inspect the `code`
+    field in the response body:
+
+    | `code` | Meaning |
+    |--------|---------|
+    | `200`  | Success |
+    | `401`  | Authentication failure |
+    | `404`  | Resource not found |
+    | `409`  | Duplicate `order_id` |
+    | `422`  | Validation failure |
+
+    ## Environments
+
+    Select a server above to switch between **Sandbox** (no real funds) and **Production**.
+
+  contact:
+    name: ZiCharge Integration Support
+    email: integrations@zicharge.com
+
+servers:
+  - url: https://dev.zicharge.com
+    description: "Sandbox — integration testing, no real funds"
+  - url: https://secure.zicharge.com
+    description: "Production — live transactions"
+
+tags:
+  - name: Deposit
+    description: |
+      Collect payments from customer ZiCharge wallets.
+
+      **Flow:** Initiate Payment → customer pays on hosted checkout → receive IPN → Validate Payment
+  - name: Withdrawal
+    description: |
+      Push credits from your merchant wallet to customer ZiCharge wallets.
+
+      **Flow:** Cashback → Validate Payment (optional)
+
+paths:
+
+  /merchant/generate-payment-token:
+    post:
+      tags: [Deposit]
+      operationId: initiatePayment
+      summary: Initiate Payment
+      description: |
+        Mint a payment token for a customer order. After a successful call, redirect the customer
+        to the `redirect_url` returned in the response. The hosted checkout page handles mobile
+        number entry and PIN verification.
+
+        The token is valid for **15 minutes**. If a customer opens an expired token, the gateway
+        cancels it and fires a `Cancelled` IPN to your listener.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateTokenRequest'
+            example:
+              merchant_mobile_no: "+9647712345678"
+              store_password: "your-store-password"
+              order_id: "ORD-2026-000123"
+              bill_amount: 5000
+              success_url: "https://yoursite.com/orders/123/success"
+              cancel_url: "https://yoursite.com/orders/123/cancel"
+              ipn_url: "https://yoursite.com/webhooks/zicharge/ipn"
+      responses:
+        '200':
+          description: Token minted — or error, check the `code` field
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenerateTokenResponse'
+              examples:
+                success:
+                  summary: Token minted
+                  value:
+                    code: 200
+                    messages: ["Token generated successfully."]
+                    data:
+                      payment_token: "tok_a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4"
+                      redirect_url: "https://secure.zicharge.com/merchant/payment?token=tok_a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4"
+                      order_id: "ORD-2026-000123"
+                      expires_in_seconds: 900
+                duplicate_order:
+                  summary: Duplicate order_id
+                  value:
+                    code: 409
+                    messages: ["Order ID already exists."]
+                    data: null
+                auth_failure:
+                  summary: Invalid credentials
+                  value:
+                    code: 401
+                    messages: ["Authentication failed."]
+                    data: null
+
+  /merchant/payment/validation:
+    post:
+      tags: [Deposit, Withdrawal]
+      operationId: validatePayment
+      summary: Validate Payment
+      description: |
+        Confirm the final status of a payment or cashback transaction by `order_id`.
+        Returns the canonical `transaction_id` to record in your books.
+
+        **When to call:**
+        - After receiving an IPN callback, to confirm and obtain `transaction_id`
+        - As a reconciliation fallback if your IPN listener missed both delivery attempts
+
+        This endpoint is **read-only** and safe to call multiple times.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidationRequest'
+            example:
+              merchant_mobile_no: "+9647712345678"
+              store_password: "your-store-password"
+              order_id: "ORD-2026-000123"
+      responses:
+        '200':
+          description: Validation result — check `data.status` for the outcome
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationResponse'
+              examples:
+                success:
+                  summary: Payment confirmed
+                  value:
+                    code: 200
+                    messages: ["Successfully Deposited."]
+                    data:
+                      transaction_id: 123456
+                      order_id: "ORD-2026-000123"
+                      bill_amount: "5000"
+                      customer_account_no: "+9647701234567"
+                      status: "Success"
+                      received_at: "2026-05-20 10:00:00"
+                cancelled:
+                  summary: Payment cancelled
+                  value:
+                    code: 200
+                    messages: ["Payment not completed."]
+                    data:
+                      order_id: "ORD-2026-000123"
+                      status: "Cancelled"
+
+  /merchant/payment/cashback:
+    post:
+      tags: [Withdrawal]
+      operationId: cashback
+      summary: Cashback
+      description: |
+        Push a credit from your merchant wallet directly to a customer's ZiCharge wallet.
+        Settled **synchronously** — the customer's balance is updated in the same response.
+
+        Use for refunds, loyalty credits, and promotional disbursements. Minimum amount is 250 IQD.
+
+        The gateway performs an atomic balance check — a `code: 422` means no funds were moved.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CashbackRequest'
+            example:
+              merchant_mobile_no: "+9647712345678"
+              store_password: "your-store-password"
+              customer_mobile_no: "+9647701234567"
+              amount: 1000
+              order_id: "CB-2026-000001"
+              remarks: "Refund for order ORD-2026-000123"
+      responses:
+        '200':
+          description: Cashback result — check `code` for the outcome
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashbackResponse'
+              examples:
+                success:
+                  summary: Credit applied
+                  value:
+                    code: 200
+                    messages: ["Cashback sent successfully."]
+                    data:
+                      transaction_id: 789012
+                      order_id: "CB-2026-000001"
+                      amount: "1000"
+                      customer_mobile_no: "+9647701234567"
+                      status: "Success"
+                      received_at: "2026-05-20 10:05:00"
+                insufficient_balance:
+                  summary: Insufficient merchant balance
+                  value:
+                    code: 422
+                    messages: ["Insufficient merchant balance."]
+                    data: null
+
+components:
+  schemas:
+
+    GenerateTokenRequest:
+      type: object
+      required: [merchant_mobile_no, store_password, order_id, bill_amount, success_url, cancel_url]
+      properties:
+        merchant_mobile_no:
+          type: string
+          description: Your merchant wallet number in E.164 format
+          example: "+9647712345678"
+        store_password:
+          type: string
+          description: Your store password — never expose client-side
+          example: "your-store-password"
+        order_id:
+          type: string
+          description: Your unique order identifier. The same order_id will not create a duplicate charge.
+          example: "ORD-2026-000123"
+        bill_amount:
+          type: number
+          description: Amount in IQD. Minimum 250. Validated with BigDecimal precision.
+          example: 5000
+          minimum: 250
+        success_url:
+          type: string
+          description: URL the customer is redirected to after successful payment
+          example: "https://yoursite.com/orders/123/success"
+        cancel_url:
+          type: string
+          description: URL the customer is redirected to after cancellation
+          example: "https://yoursite.com/orders/123/cancel"
+        ipn_url:
+          type: string
+          description: Your IPN listener endpoint (HTTPS only). Overrides the dashboard setting.
+          example: "https://yoursite.com/webhooks/zicharge/ipn"
+
+    GenerateTokenResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: "200 = success | 401 = auth failure | 409 = duplicate order_id | 422 = validation error"
+          example: 200
+        messages:
+          type: array
+          items:
+            type: string
+          example: ["Token generated successfully."]
+        data:
+          type: object
+          nullable: true
+          properties:
+            payment_token:
+              type: string
+              description: Opaque token bound to this order. Valid for 15 minutes.
+              example: "tok_a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4"
+            redirect_url:
+              type: string
+              description: Hosted checkout URL — redirect the customer here immediately
+              example: "https://secure.zicharge.com/merchant/payment?token=tok_a1b2c3d4..."
+            order_id:
+              type: string
+              example: "ORD-2026-000123"
+            expires_in_seconds:
+              type: integer
+              description: Seconds until the token expires (900 = 15 minutes)
+              example: 900
+
+    ValidationRequest:
+      type: object
+      required: [merchant_mobile_no, store_password, order_id]
+      properties:
+        merchant_mobile_no:
+          type: string
+          example: "+9647712345678"
+        store_password:
+          type: string
+          example: "your-store-password"
+        order_id:
+          type: string
+          description: The order_id submitted when initiating the payment or cashback
+          example: "ORD-2026-000123"
+
+    ValidationResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 200
+        messages:
+          type: array
+          items:
+            type: string
+          example: ["Successfully Deposited."]
+        data:
+          type: object
+          nullable: true
+          properties:
+            transaction_id:
+              type: integer
+              description: Canonical ZiCharge transaction ID — use this in your ledger
+              example: 123456
+            order_id:
+              type: string
+              example: "ORD-2026-000123"
+            bill_amount:
+              type: string
+              example: "5000"
+            customer_account_no:
+              type: string
+              example: "+9647701234567"
+            status:
+              type: string
+              enum: [Success, Cancelled]
+              example: "Success"
+            received_at:
+              type: string
+              description: UTC timestamp
+              example: "2026-05-20 10:00:00"
+
+    CashbackRequest:
+      type: object
+      required: [merchant_mobile_no, store_password, customer_mobile_no, amount, order_id]
+      properties:
+        merchant_mobile_no:
+          type: string
+          example: "+9647712345678"
+        store_password:
+          type: string
+          example: "your-store-password"
+        customer_mobile_no:
+          type: string
+          description: Recipient's ZiCharge wallet number in E.164 format
+          example: "+9647701234567"
+        amount:
+          type: number
+          description: Amount in IQD to credit. Minimum 250.
+          example: 1000
+          minimum: 250
+        order_id:
+          type: string
+          description: Your unique reference for this cashback — used for idempotency
+          example: "CB-2026-000001"
+        remarks:
+          type: string
+          description: Optional free-text note attached to the transaction
+          example: "Refund for order ORD-2026-000123"
+
+    CashbackResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: "200 = success | 401 = auth failure | 404 = customer not found | 409 = duplicate order_id | 422 = validation error or insufficient balance"
+          example: 200
+        messages:
+          type: array
+          items:
+            type: string
+          example: ["Cashback sent successfully."]
+        data:
+          type: object
+          nullable: true
+          properties:
+            transaction_id:
+              type: integer
+              description: Canonical ZiCharge transaction ID — use this in your ledger
+              example: 789012
+            order_id:
+              type: string
+              example: "CB-2026-000001"
+            amount:
+              type: string
+              example: "1000"
+            customer_mobile_no:
+              type: string
+              example: "+9647701234567"
+            status:
+              type: string
+              example: "Success"
+            received_at:
+              type: string
+              example: "2026-05-20 10:05:00"

@@ -1,4 +1,5 @@
 site_name: ZiCharge Merchant API
+site_url: https://newroztech.github.io/zc-paymentgw-developer-docs/
 site_description: Developer documentation for the ZiCharge Merchant Payment Gateway
 site_author: ZiCharge Engineering
 docs_dir: docs

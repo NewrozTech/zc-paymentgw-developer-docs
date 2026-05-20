@@ -1,0 +1,1548 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Developer documentation for the ZiCharge Merchant Payment Gateway — v3 Java engine">
+      
+      
+        <meta name="author" content="ZiCharge Engineering">
+      
+      
+      
+        <link rel="prev" href="../07-testing-and-go-live/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Migration Notes - ZiCharge Merchant API</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#8-migration-notes-previous-gateway-vs-current-java-engine" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="ZiCharge Merchant API" class="md-header__button md-logo" aria-label="ZiCharge Merchant API" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            ZiCharge Merchant API
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Migration Notes
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../01-overview/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Overview
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../02-authentication/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Authentication & Security
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../03-payment-flow/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Payment Flow
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../04-api-reference/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  API Reference
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../05-ipn-callbacks/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  IPN Callbacks
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../06-error-codes/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Error Codes
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../07-testing-and-go-live/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Testing & Go-Live
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Migration Notes
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="ZiCharge Merchant API" class="md-nav__button md-logo" aria-label="ZiCharge Merchant API" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    ZiCharge Merchant API
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication & Security
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-payment-flow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Payment Flow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-api-reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-ipn-callbacks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IPN Callbacks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-error-codes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Error Codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07-testing-and-go-live/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing & Go-Live
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Migration Notes
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Migration Notes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#81-what-is-unchanged-and-warranted-to-stay-so" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.1 What is unchanged (and warranted to stay so)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#82-behavioural-differences-you-should-know-about" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.2 Behavioural differences you should know about
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8.2 Behavioural differences you should know about">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-1-iraqi-mobile-number-regex-is-now-enforced-on-payment-endpoints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Δ-1 — Iraqi mobile-number regex is now enforced on payment endpoints
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-2-minimum-bill_amount-enforced-at-token-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Δ-2 — Minimum bill_amount enforced at token generation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-3-direct-payment-error-message-is-unified" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Δ-3 — Direct-payment error message is unified
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-4-fetch-payment-status-does-the-amount-match-at-the-database" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Δ-4 — fetch-payment-status does the amount match at the database
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-5-validate-payment-returns-code-422-on-order-not-found" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Δ-5 — validate-payment returns code 422 on "order not found"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-6-per-field-enumeration-probes-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Δ-6 — Per-field enumeration probes removed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-7-activity-log-row-written-on-successful-direct-payment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Δ-7 — Activity log row written on successful direct payment
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#83-new-capabilities-opt-in-additive" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.3 New capabilities (opt-in, additive)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#84-blocker-check-explicit-verdict" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.4 Blocker check — explicit verdict
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#85-migration-plan-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.5 Migration plan template
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#81-what-is-unchanged-and-warranted-to-stay-so" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.1 What is unchanged (and warranted to stay so)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#82-behavioural-differences-you-should-know-about" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.2 Behavioural differences you should know about
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8.2 Behavioural differences you should know about">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-1-iraqi-mobile-number-regex-is-now-enforced-on-payment-endpoints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Δ-1 — Iraqi mobile-number regex is now enforced on payment endpoints
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-2-minimum-bill_amount-enforced-at-token-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Δ-2 — Minimum bill_amount enforced at token generation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-3-direct-payment-error-message-is-unified" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Δ-3 — Direct-payment error message is unified
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-4-fetch-payment-status-does-the-amount-match-at-the-database" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Δ-4 — fetch-payment-status does the amount match at the database
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-5-validate-payment-returns-code-422-on-order-not-found" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Δ-5 — validate-payment returns code 422 on "order not found"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-6-per-field-enumeration-probes-removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Δ-6 — Per-field enumeration probes removed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-7-activity-log-row-written-on-successful-direct-payment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Δ-7 — Activity log row written on successful direct payment
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#83-new-capabilities-opt-in-additive" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.3 New capabilities (opt-in, additive)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#84-blocker-check-explicit-verdict" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.4 Blocker check — explicit verdict
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#85-migration-plan-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.5 Migration plan template
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="8-migration-notes-previous-gateway-vs-current-java-engine">8. Migration Notes — Previous Gateway vs. Current Java Engine<a class="headerlink" href="#8-migration-notes-previous-gateway-vs-current-java-engine" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>TL;DR for existing merchants:</strong> Your current integration keeps working. Endpoint URLs, request shapes, response shapes, and the IPN payload are preserved. There are seven small behavioural differences listed below — none are blockers if you follow the recommendations. New, optional capabilities (signed IPN, QR token endpoint, idempotency on cash-back) are additive.</p>
+</blockquote>
+<p>The current gateway is a complete re-engineering of the merchant payment surface on a Java 21 / Spring Boot 3.2 backend. The re-engineering was scoped explicitly to <strong>preserve the journey your merchants already know</strong> while strengthening validation, idempotency, race-safety, and observability under the hood.</p>
+<p>This chapter is the comparison map. Read it once during your upgrade audit, then keep it for reference.</p>
+<hr />
+<h2 id="81-what-is-unchanged-and-warranted-to-stay-so">8.1 What is unchanged (and warranted to stay so)<a class="headerlink" href="#81-what-is-unchanged-and-warranted-to-stay-so" title="Permanent link">&para;</a></h2>
+<p>These items are part of the wire contract and are guaranteed within this major version.</p>
+<table>
+<thead>
+<tr>
+<th>Surface</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Endpoint paths — <code>POST /merchant/generate-payment-token</code>, <code>POST /merchant/payment/validation</code>, <code>POST /merchant/payment/direct</code>, the hosted <code>GET /merchant/payment?token=...</code></td>
+<td>✅ Same</td>
+</tr>
+<tr>
+<td>Equivalent canonical paths under <code>/api/v3/merchant/...</code> are also available (recommended for new code)</td>
+<td>✅ Same behaviour</td>
+</tr>
+<tr>
+<td>Request field names — <code>merchant_mobile_no</code>, <code>store_password</code>, <code>order_id</code>, <code>bill_amount</code>, <code>success_url</code>, <code>cancel_url</code>, <code>fail_url</code>, <code>customer_mobile_no</code>, <code>payment_token</code>, <code>mobile_no</code>, <code>password</code></td>
+<td>✅ Same</td>
+</tr>
+<tr>
+<td>Credential model — <code>merchant_mobile_no</code> + <code>store_password</code> server-to-server, hosted page for customer credentials</td>
+<td>✅ Same</td>
+</tr>
+<tr>
+<td>Hosted-page URL — <code>https://&lt;host&gt;/merchant/payment?token=&lt;token&gt;</code></td>
+<td>✅ Same</td>
+</tr>
+<tr>
+<td>Token validity window — 15 minutes from mint</td>
+<td>✅ Same</td>
+</tr>
+<tr>
+<td>Response envelope — <code>{ messages, data, code }</code>, HTTP 200 for all outcomes</td>
+<td>✅ Same</td>
+</tr>
+<tr>
+<td>Legacy success envelope for <code>generate-payment-token</code> — <code>{ messages, token, code }</code></td>
+<td>✅ Same</td>
+</tr>
+<tr>
+<td>Legacy success envelope for <code>payment/direct</code> — <code>{ messages, transactionInfo, code }</code></td>
+<td>✅ Same</td>
+</tr>
+<tr>
+<td>IPN method, content-type, and field set — <code>POST application/x-www-form-urlencoded</code> with <code>transaction_id</code>, <code>order_id</code>, <code>bill_amount</code>, <code>customer_account_no</code>, <code>status</code>, <code>received_at</code>, <code>ipn=1</code></td>
+<td>✅ Same</td>
+</tr>
+<tr>
+<td>IPN status values — <code>Success</code>, <code>Cancelled</code></td>
+<td>✅ Same</td>
+</tr>
+<tr>
+<td>Both JSON and form-urlencoded request bodies accepted on server-to-server endpoints</td>
+<td>✅ Same</td>
+</tr>
+</tbody>
+</table>
+<p>If your existing integration only uses the items above, it requires no changes.</p>
+<hr />
+<h2 id="82-behavioural-differences-you-should-know-about">8.2 Behavioural differences you should know about<a class="headerlink" href="#82-behavioural-differences-you-should-know-about" title="Permanent link">&para;</a></h2>
+<p>Each item below lists: the difference, the rationale, the impact on a live integration, and the recommended action.</p>
+<h3 id="-1-iraqi-mobile-number-regex-is-now-enforced-on-payment-endpoints">Δ-1 — Iraqi mobile-number regex is now enforced on payment endpoints<a class="headerlink" href="#-1-iraqi-mobile-number-regex-is-now-enforced-on-payment-endpoints" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>What changed</strong></td>
+<td><code>merchant_mobile_no</code>, <code>customer_mobile_no</code> (when present), and customer <code>mobile_no</code> on direct payment are validated against <code>^\+964(0)?[0-9]{9,10}$</code>.</td>
+</tr>
+<tr>
+<td><strong>Why</strong></td>
+<td>The previous gateway also enforced this regex on the same endpoints. The Java engine was briefly more lax during the rebuild; this restores parity.</td>
+</tr>
+<tr>
+<td><strong>Impact on you</strong></td>
+<td>If your client was submitting numbers without the <code>+964</code> prefix, they were failing downstream anyway. They now fail at validation with a clear <code>422</code>.</td>
+</tr>
+<tr>
+<td><strong>Action</strong></td>
+<td>Send all mobiles in <code>+964XXXXXXXXXX</code> format. Validation message: <code>"The merchant mobile no format is invalid."</code> / <code>"The customer mobile no format is invalid."</code>.</td>
+</tr>
+<tr>
+<td><strong>Blocker?</strong></td>
+<td>❌ No. Same behaviour as the previous gateway.</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Note (intentional carve-out):</strong> Cash-back (<code>POST /merchant/cash-back</code>) <strong>does not</strong> enforce this regex on <code>receiver_mobile_no</code>, matching the previous gateway. The receiver is validated by existence in the user table.</p>
+</blockquote>
+<h3 id="-2-minimum-bill_amount-enforced-at-token-generation">Δ-2 — Minimum <code>bill_amount</code> enforced at token generation<a class="headerlink" href="#-2-minimum-bill_amount-enforced-at-token-generation" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>What changed</strong></td>
+<td><code>bill_amount &lt; 250</code> is rejected at token mint with <code>code</code> <code>422</code>, instead of being accepted and failing later at payment time.</td>
+</tr>
+<tr>
+<td><strong>Why</strong></td>
+<td>Fail-fast surfaces the error to your client at the moment your server has the full request context, not in the middle of a customer-facing checkout.</td>
+</tr>
+<tr>
+<td><strong>Impact on you</strong></td>
+<td>If you previously minted sub-minimum tokens for testing, you must now use ≥ 250. Production traffic that already succeeded at payment time is unaffected.</td>
+</tr>
+<tr>
+<td><strong>Action</strong></td>
+<td>Ensure your minimum order value is ≥ 250 IQD before calling token mint.</td>
+</tr>
+<tr>
+<td><strong>Blocker?</strong></td>
+<td>❌ No. The previous behaviour was a bug; the engineered behaviour is the documented limit.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="-3-direct-payment-error-message-is-unified">Δ-3 — Direct-payment error message is unified<a class="headerlink" href="#-3-direct-payment-error-message-is-unified" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>What changed</strong></td>
+<td>When the customer's credentials are invalid for any reason (unknown user, wrong password, blocked account), the message returned is the single string <code>"Mobile No. &amp; Password combination do not match."</code>. The previous gateway also used this exact wording on the unified failure path.</td>
+</tr>
+<tr>
+<td><strong>Why</strong></td>
+<td>Prevents account enumeration.</td>
+</tr>
+<tr>
+<td><strong>Impact on you</strong></td>
+<td>If your client was string-matching distinct messages (e.g., <code>"User blocked"</code>), the unified message replaces them.</td>
+</tr>
+<tr>
+<td><strong>Action</strong></td>
+<td>Match on the unified string, or — better — match on the body <code>code</code> field.</td>
+</tr>
+<tr>
+<td><strong>Blocker?</strong></td>
+<td>❌ No. The previous gateway already used the same string on the joined credential check.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="-4-fetch-payment-status-does-the-amount-match-at-the-database">Δ-4 — <code>fetch-payment-status</code> does the amount match at the database<a class="headerlink" href="#-4-fetch-payment-status-does-the-amount-match-at-the-database" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>What changed</strong></td>
+<td>The match is now <code>WHERE merchant_id = ? AND order_id = ? AND amount = ?</code> at the SQL level. The previous gateway behaved the same; an intermediate Java version compared amounts in memory after a broader fetch. The current engine restores the legacy behaviour.</td>
+</tr>
+<tr>
+<td><strong>Why</strong></td>
+<td>Deterministic, indexed lookup. Eliminates a class of decimal-precision edge cases.</td>
+</tr>
+<tr>
+<td><strong>Impact on you</strong></td>
+<td>If you were sending a wrong <code>amount</code>, you now consistently receive <code>"Awaiting payment..."</code>. There is no scenario where the previous gateway succeeded and the current one fails for the same (order, amount).</td>
+</tr>
+<tr>
+<td><strong>Action</strong></td>
+<td>None for correct integrations.</td>
+</tr>
+<tr>
+<td><strong>Blocker?</strong></td>
+<td>❌ No. Parity with the previous gateway.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="-5-validate-payment-returns-code-422-on-order-not-found">Δ-5 — <code>validate-payment</code> returns <code>code 422</code> on "order not found"<a class="headerlink" href="#-5-validate-payment-returns-code-422-on-order-not-found" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>What changed</strong></td>
+<td>Previously some Java builds returned <code>code 404</code> for "order not found"; the current engine returns <code>code 422</code> with the message <code>"Sorry! Invalid Order ID."</code>, matching the previous gateway's body-<code>code</code> shape.</td>
+</tr>
+<tr>
+<td><strong>Why</strong></td>
+<td>Restores legacy body-<code>code</code> parity.</td>
+</tr>
+<tr>
+<td><strong>Impact on you</strong></td>
+<td>A client that switched on <code>code == 404</code> for "order not found" must now switch on <code>code == 422</code> (with the <code>messages[]</code> text identifying the case).</td>
+</tr>
+<tr>
+<td><strong>Action</strong></td>
+<td>Switch on <code>code</code> for credential errors (<code>422</code> + <code>"Sorry! Invalid Store Credentials."</code>) and for missing-order (<code>422</code> + <code>"Sorry! Invalid Order ID."</code>).</td>
+</tr>
+<tr>
+<td><strong>Blocker?</strong></td>
+<td>⚠️ <strong>Audit your client.</strong> Most legacy clients already expect <code>422</code> because that is what the previous gateway returned. If your client coded against an interim Java version, update the branch.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="-6-per-field-enumeration-probes-removed">Δ-6 — Per-field enumeration probes removed<a class="headerlink" href="#-6-per-field-enumeration-probes-removed" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>What changed</strong></td>
+<td>The previous gateway exposed a sequence of Laravel-style validator probes — for example, a field-level message saying <em>the merchant mobile does not exist</em> before the credential check. The current engine returns a generic <code>"Sorry! Invalid Store Credentials."</code> instead.</td>
+</tr>
+<tr>
+<td><strong>Why</strong></td>
+<td>The earlier behaviour leaked whether a given mobile number or store password existed anywhere in the system, which is an enumeration vector.</td>
+</tr>
+<tr>
+<td><strong>Impact on you</strong></td>
+<td>A client that string-matched the field-specific message (<code>"The merchant mobile no does not exist."</code>) will not see it.</td>
+</tr>
+<tr>
+<td><strong>Action</strong></td>
+<td>Match on the unified credential message. If your business workflow requires the distinct case (very unlikely), contact integrations support — a feature-flagged legacy mode exists for the transition.</td>
+</tr>
+<tr>
+<td><strong>Blocker?</strong></td>
+<td>⚠️ <strong>Audit your client.</strong> This is a deliberate security improvement. If you find a hard dependency on the field-specific message, raise it before go-live.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="-7-activity-log-row-written-on-successful-direct-payment">Δ-7 — Activity log row written on successful direct payment<a class="headerlink" href="#-7-activity-log-row-written-on-successful-direct-payment" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>What changed</strong></td>
+<td>After a successful direct payment, the engine writes an audit row to <code>activity_logs</code> (mirroring the legacy <code>ActivityDone</code> event).</td>
+</tr>
+<tr>
+<td><strong>Why</strong></td>
+<td>Compliance and audit completeness — closes a gap that existed in early Java builds.</td>
+</tr>
+<tr>
+<td><strong>Impact on you</strong></td>
+<td>None at the API level. The row is internal. Your client will not observe this.</td>
+</tr>
+<tr>
+<td><strong>Action</strong></td>
+<td>None.</td>
+</tr>
+<tr>
+<td><strong>Blocker?</strong></td>
+<td>❌ No. Internal only.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="83-new-capabilities-opt-in-additive">8.3 New capabilities (opt-in, additive)<a class="headerlink" href="#83-new-capabilities-opt-in-additive" title="Permanent link">&para;</a></h2>
+<p>These are not present on the previous gateway. They are available immediately on the current engine. None of them break existing integrations.</p>
+<table>
+<thead>
+<tr>
+<th>Capability</th>
+<th>What it gives you</th>
+<th>How to adopt</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Canonical <code>/api/v3/merchant/...</code> paths</strong></td>
+<td>Versioned, explicit prefix</td>
+<td>Use the new paths in new client code; old paths still work</td>
+</tr>
+<tr>
+<td><strong><code>POST /merchant/generate-qr-token</code></strong></td>
+<td>Same token + a server-generated QR URL + <code>expires_in_minutes</code></td>
+<td>Replace <code>generate-payment-token</code> for in-store / kiosk / printed-media flows</td>
+</tr>
+<tr>
+<td><strong><code>GET /merchant/fetch-payment-status</code> &amp; <code>GET /merchant/fetch-payment-token-data</code></strong></td>
+<td>Idempotent GET variants of the POST endpoints</td>
+<td>Use for retry-friendly polling and CORS-enabled browser inspection</td>
+</tr>
+<tr>
+<td><strong>Signed IPN (<code>X-ZiCharge-Signature</code> + <code>X-ZiCharge-Timestamp</code> + <code>X-ZiCharge-Request-Id</code>)</strong></td>
+<td>HMAC-SHA256 authenticity proof on every IPN; constant-time verification on your side</td>
+<td>Enable on the merchant dashboard; configure <code>ipn_secret</code></td>
+</tr>
+<tr>
+<td><strong>IPN retry with cooldown gate</strong></td>
+<td>At-least-once delivery with bounded duplicate risk; up to 8 retries per terminal event</td>
+<td>Make your listener idempotent on <code>X-ZiCharge-Request-Id</code></td>
+</tr>
+<tr>
+<td><strong>Cash-back idempotency on <code>reference_id</code></strong></td>
+<td>Replay-safe cash-back / refunds</td>
+<td>Always supply a stable <code>reference_id</code></td>
+</tr>
+<tr>
+<td><strong>SSRF-hardened IPN dispatch</strong></td>
+<td>Internal-range URLs are refused</td>
+<td>None — keep your <code>ipn_url</code> public-resolvable HTTPS</td>
+</tr>
+<tr>
+<td><strong>Stronger token state machine</strong></td>
+<td>Pessimistic lock + conditional UPDATE eliminates the historical "race between cancel and pay" class of bugs</td>
+<td>None — automatic</td>
+</tr>
+<tr>
+<td><strong>First-page hosted UX polish</strong></td>
+<td>Localized (en/ar/ku), responsive, iframe-embeddable, JS countdown, in-page cancel</td>
+<td>None — automatic</td>
+</tr>
+<tr>
+<td><strong>Structured observability</strong></td>
+<td>Every interaction tagged with <code>X-ZiCharge-Request-Id</code>; correlatable end-to-end</td>
+<td>Log the ID on your side, include in support requests</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="84-blocker-check-explicit-verdict">8.4 Blocker check — explicit verdict<a class="headerlink" href="#84-blocker-check-explicit-verdict" title="Permanent link">&para;</a></h2>
+<p>The audit team compared the current Java implementation, endpoint by endpoint, against the documented legacy behaviour and the previous gateway's PHP source. Findings:</p>
+<table>
+<thead>
+<tr>
+<th>Concern</th>
+<th>Verdict</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Endpoint paths drift</td>
+<td>✅ None. All legacy paths preserved; canonical <code>/api/v3/merchant/...</code> is additive.</td>
+</tr>
+<tr>
+<td>Request shapes drift</td>
+<td>✅ None. Same field names, same types, same required/optional split.</td>
+</tr>
+<tr>
+<td>Response envelope drift</td>
+<td>✅ None. <code>{ messages, data, code }</code> for v3 endpoints; legacy envelopes preserved for <code>generate-payment-token</code> and <code>payment/direct</code>.</td>
+</tr>
+<tr>
+<td>HTTP status drift</td>
+<td>✅ None. HTTP 200 across the board, outcome in body <code>code</code>.</td>
+</tr>
+<tr>
+<td>IPN contract drift</td>
+<td>✅ None. Form-encoded POST, same fields, same values. New optional headers (signature, timestamp, request-id) are additive.</td>
+</tr>
+<tr>
+<td>Token lifetime drift</td>
+<td>✅ None. 15-minute validity preserved.</td>
+</tr>
+<tr>
+<td>Validation drift</td>
+<td>⚠️ <strong>Two intentional changes</strong> — Δ-1 (regex on payment endpoints — matches previous gateway), Δ-2 (min <code>bill_amount</code> at mint — matches the documented limit). Neither is a regression.</td>
+</tr>
+<tr>
+<td>Body-<code>code</code> drift</td>
+<td>⚠️ <strong>One intentional change</strong> — Δ-5 (<code>validate-payment</code> returns <code>422</code> for missing order, matching the previous gateway). Only an interim Java version returned <code>404</code>.</td>
+</tr>
+<tr>
+<td>Message wording drift</td>
+<td>⚠️ <strong>One intentional change</strong> — Δ-6 (per-field enumeration messages removed; unified credential message used). Deliberate security improvement.</td>
+</tr>
+<tr>
+<td>Side-effect drift</td>
+<td>✅ One additive change — Δ-7 (audit-log row written on direct-payment success). Not externally observable.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Verdict: no blockers for live merchants.</strong> All differences are either parity restorations against the previous gateway or deliberate, documented security improvements. The two items worth client-side auditing are <strong>Δ-5</strong> (body <code>code</code> <code>422</code> on missing-order) and <strong>Δ-6</strong> (unified credential message). Both can be handled by switching client logic from string-match to <code>code</code>-match — the recommended path even on the previous gateway.</p>
+<hr />
+<h2 id="85-migration-plan-template">8.5 Migration plan template<a class="headerlink" href="#85-migration-plan-template" title="Permanent link">&para;</a></h2>
+<p>A safe path for an existing merchant to upgrade:</p>
+<ol>
+<li><strong>Day 0</strong> — point a sandbox client at <code>https://dev.zicharge.com</code> using the current engine. Run the <a href="../07-testing-and-go-live/#72-test-plan-checklist">test plan</a>.</li>
+<li><strong>Day 0–7</strong> — audit your client for: hard-coded HTTP status checks (none should exist; if any do, switch to <code>code</code>), and for the two intentional message changes in Δ-5 and Δ-6.</li>
+<li><strong>Day 7</strong> — enable the signed-IPN feature on your sandbox merchant config; update your listener to verify signatures.</li>
+<li><strong>Day 14</strong> — sign off on the sandbox plan. Schedule production switch.</li>
+<li><strong>Day 15</strong> — flip production traffic. No DNS or endpoint change required — production already runs on the current engine. The "switch" is your own client deploy if any changes were needed.</li>
+<li><strong>Day 15–30</strong> — monitor IPN delivery success rate and reconciliation gaps using <code>X-ZiCharge-Request-Id</code> correlation.</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../07-testing-and-go-live/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Testing &amp; Go-Live">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Testing & Go-Live
+              </div>
+            </div>
+          </a>
+        
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="mailto:integrations@zicharge.com" target="_blank" rel="noopener" title="Integration Support" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4l208 156a48 48 0 0 0 57.6 0l208-156c12.1-9.1 19.2-23.3 19.2-38.4 0-26.5-21.5-48-48-48zM0 196v188c0 35.3 28.7 64 64 64h384c35.3 0 64-28.7 64-64V196L313.6 344.8c-34.1 25.6-81.1 25.6-115.2 0z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.footer", "search.highlight", "search.suggest", "search.share", "content.code.copy", "content.code.annotate", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

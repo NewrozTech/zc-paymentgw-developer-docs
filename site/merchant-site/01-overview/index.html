@@ -1,0 +1,1355 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Developer documentation for the ZiCharge Merchant Payment Gateway — v3 Java engine">
+      
+      
+        <meta name="author" content="ZiCharge Engineering">
+      
+      
+      
+        <link rel="prev" href="..">
+      
+      
+        <link rel="next" href="../02-authentication/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Overview - ZiCharge Merchant API</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#1-overview" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="ZiCharge Merchant API" class="md-header__button md-logo" aria-label="ZiCharge Merchant API" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            ZiCharge Merchant API
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Overview
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Overview
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../02-authentication/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Authentication & Security
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../03-payment-flow/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Payment Flow
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../04-api-reference/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  API Reference
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../05-ipn-callbacks/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  IPN Callbacks
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../06-error-codes/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Error Codes
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../07-testing-and-go-live/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Testing & Go-Live
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../08-migration-notes/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Migration Notes
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="ZiCharge Merchant API" class="md-nav__button md-logo" aria-label="ZiCharge Merchant API" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    ZiCharge Merchant API
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-the-gateway-does" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What the gateway does
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#supported-flows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Supported flows
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environments
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api-path-conventions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API path conventions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#content-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Content types
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#response-envelope" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Response envelope
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#amounts-and-currency" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Amounts and currency
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#locale-internationalization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Locale &amp; internationalization
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#identifiers-used-in-this-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Identifiers used in this API
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#token-lifecycle-at-a-glance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Token lifecycle (at a glance)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#where-to-go-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where to go next
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication & Security
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-payment-flow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Payment Flow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-api-reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-ipn-callbacks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IPN Callbacks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-error-codes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Error Codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07-testing-and-go-live/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing & Go-Live
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../08-migration-notes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Migration Notes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-the-gateway-does" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What the gateway does
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#supported-flows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Supported flows
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environments
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api-path-conventions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API path conventions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#content-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Content types
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#response-envelope" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Response envelope
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#amounts-and-currency" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Amounts and currency
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#locale-internationalization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Locale &amp; internationalization
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#identifiers-used-in-this-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Identifiers used in this API
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#token-lifecycle-at-a-glance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Token lifecycle (at a glance)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#where-to-go-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where to go next
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="1-overview">1. Overview<a class="headerlink" href="#1-overview" title="Permanent link">&para;</a></h1>
+<h2 id="what-the-gateway-does">What the gateway does<a class="headerlink" href="#what-the-gateway-does" title="Permanent link">&para;</a></h2>
+<p>The ZiCharge Merchant Payment Gateway lets your platform accept payments from any ZiCharge wallet account. From the customer's perspective, it is a one-page checkout where they enter their mobile number and password (or 4-digit PIN) and confirm. From your platform's perspective, it is a small set of HTTP endpoints plus an asynchronous callback (IPN) delivered to a URL you configure.</p>
+<p>The gateway is engineered on a Java 21 / Spring Boot 3.2 backend. Highlights that matter to integrators:</p>
+<ul>
+<li><strong>Stable, versioned contract</strong> — the response envelope (<code>messages</code>, <code>data</code>, <code>code</code>) and field names are guaranteed within a major version.</li>
+<li><strong>Idempotent token lifecycle</strong> — minting a token, paying it, cancelling it, and retrying an IPN are all safe to re-issue without producing duplicate state.</li>
+<li><strong>Race-free state transitions</strong> — the payment record uses pessimistic locking and conditional updates so concurrent pay / cancel / expiry resolve to a single, consistent outcome.</li>
+<li><strong>At-least-once IPN delivery with automatic retries</strong> — IPN delivery is cooldown-gated and replayable; you will receive every terminal event eventually, even if your listener is briefly unreachable.</li>
+<li><strong>SSRF-hardened callbacks</strong> — outbound IPN traffic is restricted by an allow-list policy on the gateway side.</li>
+<li><strong>Stateless, horizontally scalable JVM tier</strong> — under a TLS-terminating load balancer with a Web Application Firewall.</li>
+</ul>
+<h2 id="supported-flows">Supported flows<a class="headerlink" href="#supported-flows" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Flow</th>
+<th>What it is</th>
+<th>Best for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Hosted Payment Page</strong></td>
+<td>Mint a token → redirect customer to the gateway's hosted page → IPN + validation</td>
+<td>Web checkouts, mobile webviews, QR-code-to-link</td>
+</tr>
+<tr>
+<td><strong>Direct Charge</strong></td>
+<td>Mint a token → submit customer credentials to <code>POST /merchant/payment/direct</code> from a trusted channel</td>
+<td>Custom checkout surfaces under strict PCI-equivalent controls</td>
+</tr>
+<tr>
+<td><strong>QR Token</strong></td>
+<td>Same as hosted page, but the response also includes a server-generated QR URL</td>
+<td>In-store POS, kiosks, printed media</td>
+</tr>
+<tr>
+<td><strong>Cash-Back</strong></td>
+<td>Push a refund / promo credit from the merchant wallet to a customer wallet</td>
+<td>Refunds, loyalty rewards</td>
+</tr>
+</tbody>
+</table>
+<p>All four flows share the same authentication and the same IPN contract.</p>
+<h2 id="environments">Environments<a class="headerlink" href="#environments" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Environment</th>
+<th>Gateway base URL</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sandbox</td>
+<td><code>https://dev.zicharge.com</code></td>
+<td>Integration testing, no real funds movement</td>
+</tr>
+<tr>
+<td>Production</td>
+<td><code>https://secure.zicharge.com</code></td>
+<td>Live transactions</td>
+</tr>
+</tbody>
+</table>
+<p>All traffic is HTTPS-only with TLS 1.2 or higher. HTTP downgrade is not supported.</p>
+<h2 id="api-path-conventions">API path conventions<a class="headerlink" href="#api-path-conventions" title="Permanent link">&para;</a></h2>
+<p>Two equivalent path prefixes are exposed:</p>
+<ul>
+<li><code>/api/v3/merchant/...</code> — the canonical, versioned path. <strong>Recommended for new integrations.</strong></li>
+<li><code>/merchant/...</code> — a flat path retained for backwards compatibility with integrations that started on the previous gateway. <strong>No behavioural difference.</strong></li>
+</ul>
+<p>Both prefixes serve the same controllers, the same validation, and the same response envelope. Pick one and stick with it per integration.</p>
+<h2 id="content-types">Content types<a class="headerlink" href="#content-types" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Endpoint family</th>
+<th>JSON</th>
+<th><code>application/x-www-form-urlencoded</code></th>
+<th><code>multipart/form-data</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Generate token</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Validate / status / token-data</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Direct payment</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Cash-back</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Transactions list</td>
+<td>✅ (GET)</td>
+<td>n/a</td>
+<td>n/a</td>
+</tr>
+<tr>
+<td>IPN delivered to <strong>your</strong> listener</td>
+<td>n/a</td>
+<td>✅ (we POST form-urlencoded to you)</td>
+<td>n/a</td>
+</tr>
+</tbody>
+</table>
+<p>JSON is preferred for new integrations. Form-encoded variants exist so that integrations that were originally form-based keep working without changes.</p>
+<h2 id="response-envelope">Response envelope<a class="headerlink" href="#response-envelope" title="Permanent link">&para;</a></h2>
+<p>Every endpoint returns <strong>HTTP 200</strong>, including when the outcome is a business-level failure. The real outcome is carried inside the JSON body in the <code>code</code> field:</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nt">&quot;messages&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;Successfully Deposited.&quot;</span><span class="p">],</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">}</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">}</span>
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>code</code></td>
+<td>integer</td>
+<td>The logical outcome. <code>200</code> = success. Non-success values are documented in <a href="../06-error-codes/">06-error-codes.md</a>.</td>
+</tr>
+<tr>
+<td><code>messages</code></td>
+<td>array of strings</td>
+<td>One or more localized human-readable messages. Always an array.</td>
+</tr>
+<tr>
+<td><code>data</code></td>
+<td>object | array | null</td>
+<td>Endpoint-specific payload. <code>null</code> on errors.</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Why HTTP 200 instead of HTTP 4xx?</strong> This contract is identical to the previous gateway and is preserved on purpose. Some legacy proxies and merchant SDKs treat non-2xx HTTP statuses as transport failures and retry, which can cause duplicate side-effects. Keeping the logical outcome in the body lets your client decide retry semantics safely.</p>
+</blockquote>
+<p>Endpoints that pre-date the v3 prefix (<code>POST /merchant/generate-payment-token</code>, <code>POST /merchant/payment/direct</code>) use an extended legacy envelope that adds top-level fields (<code>token</code>, <code>transactionInfo</code>) alongside <code>messages</code> and <code>code</code>. The exact shape is documented per-endpoint in <a href="../04-api-reference/">04-api-reference.md</a>.</p>
+<h2 id="amounts-and-currency">Amounts and currency<a class="headerlink" href="#amounts-and-currency" title="Permanent link">&para;</a></h2>
+<ul>
+<li>All amounts are in <strong>IQD</strong> (Iraqi Dinar).</li>
+<li>Amounts are transmitted as decimal numbers; integer amounts are required for transaction limits and are recommended for <code>bill_amount</code>.</li>
+<li>The minimum <code>bill_amount</code> is <strong>250 IQD</strong> at token generation. Sub-minimum tokens are rejected before they are created.</li>
+<li>Amounts are validated with <code>BigDecimal</code> precision on the server. There is no floating-point rounding in the payment path.</li>
+</ul>
+<h2 id="locale-internationalization">Locale &amp; internationalization<a class="headerlink" href="#locale-internationalization" title="Permanent link">&para;</a></h2>
+<ul>
+<li>The gateway honours the <code>Accept-Language</code> request header.</li>
+<li>Supported languages: English (<code>en</code>), Arabic (<code>ar</code>), Kurdish (<code>ku</code>).</li>
+<li>Some endpoints also accept a <code>lang</code> field in the body for explicit override; when both are provided, the body field wins.</li>
+<li>Error messages, success messages, and the hosted payment page are all localized.</li>
+</ul>
+<h2 id="identifiers-used-in-this-api">Identifiers used in this API<a class="headerlink" href="#identifiers-used-in-this-api" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Identifier</th>
+<th>Format</th>
+<th>Source</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>merchant_mobile_no</code></td>
+<td><code>+964</code> + 10 digits, optional leading 0 inside the local part</td>
+<td>Provisioned at merchant onboarding</td>
+<td>Identifies the merchant wallet on every server-to-server call</td>
+</tr>
+<tr>
+<td><code>store_password</code></td>
+<td>Opaque string</td>
+<td>Provisioned at merchant onboarding</td>
+<td>Authenticates server-to-server calls; never exposed to customers</td>
+</tr>
+<tr>
+<td><code>order_id</code></td>
+<td>Opaque string, must be unique per merchant</td>
+<td><strong>Your</strong> system</td>
+<td>Idempotency anchor — same <code>order_id</code> on token mint won't double-charge</td>
+</tr>
+<tr>
+<td><code>payment_token</code></td>
+<td>Opaque token, ≥ 32 chars</td>
+<td>Returned by <code>generate-payment-token</code></td>
+<td>Bound to one <code>order_id</code> and one validity window</td>
+</tr>
+<tr>
+<td><code>transaction_id</code></td>
+<td>Numeric, server-issued</td>
+<td>Returned in IPN and validation responses</td>
+<td>Use this in your books as the canonical ZiCharge reference</td>
+</tr>
+<tr>
+<td><code>customer_mobile_no</code></td>
+<td><code>+964</code> + 10 digits</td>
+<td>Set by the customer at checkout, optionally pre-filled</td>
+<td>The paying account</td>
+</tr>
+</tbody>
+</table>
+<h2 id="token-lifecycle-at-a-glance">Token lifecycle (at a glance)<a class="headerlink" href="#token-lifecycle-at-a-glance" title="Permanent link">&para;</a></h2>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>   created           paid           validated
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>  ─────────►───────────────►────────────────►
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>                 ▲                ▲
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>       cancelled │                │ fetch-status / validate-payment
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>       (user / system / timeout)  │
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>                 │                │
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>                 └─► IPN dispatched (Success | Cancelled)
+</span></code></pre></div>
+<p>A token is <strong>valid for 15 minutes</strong> from creation. After 15 minutes it can no longer be paid. If a customer opens an already-expired token, the gateway will mark it cancelled and fire a <code>Cancelled</code> IPN so your system can release the cart.</p>
+<h2 id="where-to-go-next">Where to go next<a class="headerlink" href="#where-to-go-next" title="Permanent link">&para;</a></h2>
+<ul>
+<li>New integration → <a href="../03-payment-flow/">03-payment-flow.md</a> then <a href="../04-api-reference/">04-api-reference.md</a>.</li>
+<li>Existing integration → <a href="../08-migration-notes/">08-migration-notes.md</a> first.</li>
+<li>Building the IPN listener → <a href="../05-ipn-callbacks/">05-ipn-callbacks.md</a>.</li>
+<li>Going to production → <a href="../07-testing-and-go-live/">07-testing-and-go-live.md</a>.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href=".." class="md-footer__link md-footer__link--prev" aria-label="Previous: Home">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Home
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../02-authentication/" class="md-footer__link md-footer__link--next" aria-label="Next: Authentication &amp; Security">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Authentication & Security
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="mailto:integrations@zicharge.com" target="_blank" rel="noopener" title="Integration Support" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4l208 156a48 48 0 0 0 57.6 0l208-156c12.1-9.1 19.2-23.3 19.2-38.4 0-26.5-21.5-48-48-48zM0 196v188c0 35.3 28.7 64 64 64h384c35.3 0 64-28.7 64-64V196L313.6 344.8c-34.1 25.6-81.1 25.6-115.2 0z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.footer", "search.highlight", "search.suggest", "search.share", "content.code.copy", "content.code.annotate", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

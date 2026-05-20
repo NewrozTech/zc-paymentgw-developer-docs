@@ -1,0 +1,36 @@
+{% extends "main.html" %}
+
+{% block tabs %}{{ super() }}{% endblock %}
+
+{% block hero %}
+<div class="zi-hero">
+  <div class="zi-hero__inner">
+    <div class="zi-hero__badge">Merchant Payment Gateway &nbsp;·&nbsp; Developer Documentation</div>
+    <h1 class="zi-hero__title">ZiCharge Merchant<br>Payment API</h1>
+    <p class="zi-hero__subtitle">
+      Accept payments from ZiCharge wallet holders through a hosted checkout,
+      direct API charge, or QR-code flow. Simple integration, reliable delivery,
+      and real-time payment notifications.
+    </p>
+    <div class="zi-hero__actions">
+      <a href="01-overview/" class="zi-btn zi-btn--primary">Get started</a>
+      <a href="04-api-reference/" class="zi-btn zi-btn--outline">API reference</a>
+    </div>
+    <div class="zi-hero__stats">
+      <div class="zi-stat"><span class="zi-stat__num">4</span><span class="zi-stat__label">Payment flows</span></div>
+      <div class="zi-stat__divider"></div>
+      <div class="zi-stat"><span class="zi-stat__num">7</span><span class="zi-stat__label">API endpoints</span></div>
+      <div class="zi-stat__divider"></div>
+      <div class="zi-stat"><span class="zi-stat__num">3</span><span class="zi-stat__label">Languages</span></div>
+      <div class="zi-stat__divider"></div>
+      <div class="zi-stat"><span class="zi-stat__num">99.9%</span><span class="zi-stat__label">Uptime SLA</span></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+{{ super() }}
+{% endblock %}
+
+{% block sidebar %}{% endblock %}

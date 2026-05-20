@@ -1,0 +1,1289 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Developer documentation for the ZiCharge Merchant Payment Gateway">
+      
+      
+        <meta name="author" content="ZiCharge Engineering">
+      
+      
+      
+        <link rel="prev" href="../02-authentication/">
+      
+      
+        <link rel="next" href="../04-api-reference/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Payment Flow - ZiCharge Merchant API</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#payment-flow" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="ZiCharge Merchant API" class="md-header__button md-logo" aria-label="ZiCharge Merchant API" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            ZiCharge Merchant API
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Payment Flow
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../01-overview/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Overview
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../02-authentication/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Authentication & Security
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Payment Flow
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../04-api-reference/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  API Reference
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../05-ipn-callbacks/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  IPN Callbacks
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../06-error-codes/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Error Codes
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../07-testing-and-go-live/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Testing & Go-Live
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../08-migration-notes/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Platform Notes
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="ZiCharge Merchant API" class="md-nav__button md-logo" aria-label="ZiCharge Merchant API" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    ZiCharge Merchant API
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication & Security
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Payment Flow
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Payment Flow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#happy-path-hosted-page" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Happy path — hosted page
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#customer-cancels-or-token-expires" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Customer cancels or token expires
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#token-state-machine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Token state machine
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ipn-delivery-retry-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IPN delivery &amp; retry policy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#direct-payment-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Direct payment flow
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reconciliation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reconciliation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reconciliation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fetch-payment-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fetch-payment-status
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validate-payment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        validate-payment
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#timing-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Timing reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-api-reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-ipn-callbacks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IPN Callbacks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-error-codes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Error Codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07-testing-and-go-live/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing & Go-Live
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../08-migration-notes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Platform Notes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#happy-path-hosted-page" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Happy path — hosted page
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#customer-cancels-or-token-expires" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Customer cancels or token expires
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#token-state-machine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Token state machine
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ipn-delivery-retry-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IPN delivery &amp; retry policy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#direct-payment-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Direct payment flow
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reconciliation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reconciliation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reconciliation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fetch-payment-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fetch-payment-status
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validate-payment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        validate-payment
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#timing-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Timing reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="payment-flow">Payment Flow<a class="headerlink" href="#payment-flow" title="Permanent link">&para;</a></h1>
+<p>Read this before the API reference — the endpoints will make much more sense as a glossary once you understand the flow end-to-end.</p>
+<div class="zi-info-row">
+<div class="zi-info-box">
+<p><strong>Token window</strong></p>
+<p>15 minutes from mint. After expiry, the token cannot be paid and will auto-cancel on next open.</p>
+</div>
+<div class="zi-info-box">
+<p><strong>IPN retries</strong></p>
+<p>Up to 2 attempts. If the first attempt fails, a retry is sent after 5 minutes.</p>
+</div>
+<div class="zi-info-box">
+<p><strong>Confirmation</strong></p>
+<p>Use both the IPN and a synchronous status check before fulfilling — they are both authoritative.</p>
+</div>
+</div>
+<hr />
+<h2 id="happy-path-hosted-page">Happy path — hosted page<a class="headerlink" href="#happy-path-hosted-page" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>sequenceDiagram
+    autonumber
+    participant C as Customer
+    participant B as Your Backend
+    participant G as ZiCharge Gateway
+    participant I as Your IPN Listener
+
+    C-&gt;&gt;B: Checkout / add to cart
+    B-&gt;&gt;G: POST /merchant/generate-payment-token
+    G--&gt;&gt;B: { code: 200, token: "tkn_..." }
+    B-&gt;&gt;C: HTTP 302 → ZiCharge hosted page
+    C-&gt;&gt;G: GET /merchant/payment?token=tkn_...
+    G--&gt;&gt;C: Hosted payment page (mobile + PIN)
+    C-&gt;&gt;G: Submit credentials
+    G-&gt;&gt;G: Authenticate · debit · credit · mark USED
+    G--&gt;&gt;C: Success screen + redirect to success_url
+    G-)I: POST ipn_url (async, form-encoded, status=Success)
+    I--&gt;&gt;G: HTTP 200 (after persistence)
+    B-&gt;&gt;G: POST /merchant/fetch-payment-status
+    G--&gt;&gt;B: { code: 200, paid: true }
+    B-&gt;&gt;B: Fulfil order</code></pre>
+<div class="admonition info">
+<p class="admonition-title">Two confirmation channels — both intentional</p>
+<p>The <strong>IPN callback</strong> is your primary signal. The synchronous <strong><code>fetch-payment-status</code></strong> call is your fallback when the IPN is delayed or your listener was briefly down. Either one is authoritative on its own — using both makes your integration bulletproof.</p>
+</div>
+<hr />
+<h2 id="customer-cancels-or-token-expires">Customer cancels or token expires<a class="headerlink" href="#customer-cancels-or-token-expires" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>sequenceDiagram
+    autonumber
+    participant C as Customer
+    participant G as ZiCharge Gateway
+    participant I as Your IPN Listener
+
+    C-&gt;&gt;G: Click Cancel on hosted page (or 15-min timer elapses)
+    G-&gt;&gt;G: Mark token CANCELLED (first-write-wins lock)
+    G--&gt;&gt;C: Payment cancelled → redirect to cancel_url
+    G-)I: POST ipn_url (async, status=Cancelled)
+    I--&gt;&gt;G: HTTP 200 (after persistence)</code></pre>
+<div class="admonition warning">
+<p class="admonition-title">Release the cart on a Cancelled IPN</p>
+<p>When you receive <code>status=Cancelled</code>, release the hold on the customer's cart immediately. If your listener was down during the retry window, poll <code>fetch-payment-status</code> after your order timeout to recover.</p>
+</div>
+<hr />
+<h2 id="token-state-machine">Token state machine<a class="headerlink" href="#token-state-machine" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>stateDiagram-v2
+    direction LR
+
+    [*] --&gt; PENDING : Token minted\n(15-min window starts)
+    PENDING --&gt; USED : Customer pays\non hosted page
+    PENDING --&gt; CANCELLED : Customer clicks Cancel
+    PENDING --&gt; CANCELLED : Timer expires (15 min)
+    PENDING --&gt; CANCELLED : Customer opens\nalready-expired link
+    USED --&gt; [*] : IPN dispatched — Success
+    CANCELLED --&gt; [*] : IPN dispatched — Cancelled</code></pre>
+<p>State transitions are protected by three mechanisms:</p>
+<div class="zi-trust-grid">
+<div class="zi-trust-card">
+<div class="zi-trust-card__num">1</div>
+<p><strong>Pessimistic write lock</strong></p>
+<p>Token row is locked during payment processing with a 3 s wait timeout — fail-fast under contention.</p>
+</div>
+<div class="zi-trust-card">
+<div class="zi-trust-card__num">2</div>
+<p><strong>Conditional UPDATE</strong></p>
+<p>Cancel runs <code>WHERE cancelled_at IS NULL</code> — first-write-wins, no silent overwrites.</p>
+</div>
+<div class="zi-trust-card">
+<div class="zi-trust-card__num">3</div>
+<p><strong>Atomic dispatch claim</strong></p>
+<p>IPN sends are claimed atomically before dispatch — duplicate IPNs across overlapping retry runs are physically impossible.</p>
+</div>
+</div>
+<hr />
+<h2 id="ipn-delivery-retry-policy">IPN delivery &amp; retry policy<a class="headerlink" href="#ipn-delivery-retry-policy" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>flowchart TD
+    A([Terminal state reached]) --&gt; B[Dispatch IPN\nPOST to ipn_url]
+    B --&gt; C{Listener returned\nHTTP 2xx?}
+    C -- Yes --&gt; D([Delivered\nNo more retries])
+    C -- No / timeout --&gt; E{Attempt\nnumber &lt; 8?}
+    E -- Yes --&gt; F[Wait 5 minutes]
+    F --&gt; B
+    E -- No --&gt; G([Max retries reached\nRecover via reconciliation API])</code></pre>
+<table>
+<thead>
+<tr>
+<th>Attempt</th>
+<th>Timing</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Immediately after database commit</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Retry sent 5 minutes after the first failed attempt</td>
+</tr>
+<tr>
+<td>Max</td>
+<td>2 attempts per terminal event</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition danger">
+<p class="admonition-title">Acknowledge only after you persist</p>
+<p>Return HTTP <strong>2xx only after</strong> writing the IPN to your database. A 2xx permanently stops all retries. If your database is unavailable, return <strong>5xx</strong> and we will retry.</p>
+</div>
+<hr />
+<h2 id="direct-payment-flow">Direct payment flow<a class="headerlink" href="#direct-payment-flow" title="Permanent link">&para;</a></h2>
+<p>For merchants running their own checkout surface — mobile app or in-store POS:</p>
+<pre class="mermaid"><code>sequenceDiagram
+    autonumber
+    participant B as Your Backend
+    participant G as ZiCharge Gateway
+    participant I as Your IPN Listener
+
+    B-&gt;&gt;G: POST /merchant/generate-payment-token
+    G--&gt;&gt;B: { token: "tkn_..." }
+    B-&gt;&gt;G: POST /merchant/payment/direct
+    note right of B: { mobile_no, password, payment_token }
+    G-&gt;&gt;G: Authenticate · debit · credit · mark USED
+    G--&gt;&gt;B: { code: 200, transactionInfo: { ... } } (synchronous)
+    G-)I: POST ipn_url (async, status=Success)
+    I--&gt;&gt;G: HTTP 200</code></pre>
+<div class="admonition warning">
+<p class="admonition-title">PCI-equivalent controls required</p>
+<p>The direct endpoint accepts the customer's wallet password. Your channel <strong>must</strong> be server-to-server only — never route customer credentials through a browser or mobile client, and never persist the password. Prefer the hosted page for any web or webview context.</p>
+</div>
+<hr />
+<h2 id="reconciliation">Reconciliation<a class="headerlink" href="#reconciliation" title="Permanent link">&para;</a></h2>
+<p>Use these read-only endpoints when the IPN is late, your listener was down, or you need to confirm before fulfilling:</p>
+<div class="zi-env-grid">
+<div class="zi-env-card zi-env-card--sandbox">
+<h3 id="fetch-payment-status">fetch-payment-status<a class="headerlink" href="#fetch-payment-status" title="Permanent link">&para;</a></h3>
+<p><code>POST /merchant/fetch-payment-status</code></p>
+<p>Fast yes/no check. Exact-match on <code>(merchant_id, order_id, amount)</code> at the database level.</p>
+<p><strong>Use when:</strong> you know the <code>order_id</code> and <code>amount</code> and need a quick paid/unpaid answer.</p>
+</div>
+<div class="zi-env-card zi-env-card--prod">
+<h3 id="validate-payment">validate-payment<a class="headerlink" href="#validate-payment" title="Permanent link">&para;</a></h3>
+<p><code>POST /merchant/validate-payment</code></p>
+<p>Full transaction detail — <code>transaction_id</code>, <code>customer_account_no</code>, <code>received_at</code>, and <code>status</code>.</p>
+<p><strong>Use when:</strong> you need the canonical ZiCharge reference for your books or a support query.</p>
+</div>
+</div>
+<p>Both endpoints are read-only and safe to call as often as needed.</p>
+<hr />
+<h2 id="timing-reference">Timing reference<a class="headerlink" href="#timing-reference" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th style="text-align: center;">Typical</th>
+<th style="text-align: center;">P99 budget</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>generate-payment-token</code></td>
+<td style="text-align: center;">&lt; 100 ms</td>
+<td style="text-align: center;">300 ms</td>
+</tr>
+<tr>
+<td><code>validate-payment</code> / <code>fetch-payment-status</code></td>
+<td style="text-align: center;">&lt; 80 ms</td>
+<td style="text-align: center;">250 ms</td>
+</tr>
+<tr>
+<td><code>payment/direct</code> (synchronous portion)</td>
+<td style="text-align: center;">&lt; 500 ms</td>
+<td style="text-align: center;">1.5 s</td>
+</tr>
+<tr>
+<td>Token validity window</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">15 min from mint</td>
+</tr>
+<tr>
+<td>IPN dispatch after commit</td>
+<td style="text-align: center;">&lt; 1 s nominal</td>
+<td style="text-align: center;">Up to 2 retries</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition tip">
+<p class="admonition-title">Set explicit HTTP client timeouts</p>
+<p>Configure <strong>2 s connect</strong> and <strong>10 s read</strong> timeouts on all gateway calls. These are gateway-side budgets and exclude your own backend latency.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../02-authentication/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Authentication &amp; Security">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Authentication & Security
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../04-api-reference/" class="md-footer__link md-footer__link--next" aria-label="Next: API Reference">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                API Reference
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="mailto:integrations@zicharge.com" target="_blank" rel="noopener" title="Integration Support" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4l208 156a48 48 0 0 0 57.6 0l208-156c12.1-9.1 19.2-23.3 19.2-38.4 0-26.5-21.5-48-48-48zM0 196v188c0 35.3 28.7 64 64 64h384c35.3 0 64-28.7 64-64V196L313.6 344.8c-34.1 25.6-81.1 25.6-115.2 0z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.footer", "navigation.indexes", "search.highlight", "search.suggest", "search.share", "content.code.copy", "content.code.annotate", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>

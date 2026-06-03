@@ -1,6 +1,6 @@
 # Validate Payment
 
-Confirms the status of a cashback transaction by `order_id`. Returns the canonical `transaction_id` for your records. Safe to call multiple times.
+Confirms the status of a cashback transaction by passing the `reference_id` as `order_id`. Returns the canonical `tx_unique_id` for your records. Safe to call multiple times.
 
 ---
 
@@ -10,7 +10,7 @@ Confirms the status of a cashback transaction by `order_id`. Returns the canonic
 POST /merchant/payment/validation
 ```
 
-**Base URLs**
+Also available at alias: `/merchant/validate-payment`
 
 | Environment | Base URL |
 |-------------|----------|
@@ -86,10 +86,7 @@ POST /merchant/payment/validation
       'https://secure.zicharge.com/merchant/payment/validation',
       {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({
           merchant_mobile_no: '+9647712345678',
           store_password: 'your-store-password',
@@ -97,7 +94,6 @@ POST /merchant/payment/validation
         }),
       }
     );
-
     const data = await response.json();
     ```
 
@@ -109,7 +105,7 @@ POST /merchant/payment/validation
 |-----------|------|----------|-------------|
 | `merchant_mobile_no` | string | Required | Your merchant wallet number in E.164 format. |
 | `store_password` | string | Required | Your store password. |
-| `order_id` | string | Required | The `order_id` submitted when initiating the cashback. |
+| `order_id` | string | Required | Pass the `reference_id` from the [Cashback](cashback.md) request as `order_id`. |
 
 ---
 
@@ -118,24 +114,24 @@ POST /merchant/payment/validation
 ```json
 {
   "code": 200,
-  "messages": ["Cashback confirmed."],
+  "messages": ["Please find your transaction details."],
   "data": {
-    "transaction_id": 789012,
+    "tx_unique_id": "CVIBAON916",
     "order_id": "CB-2026-000001",
-    "amount": "1000",
-    "customer_mobile_no": "+9647701234567",
+    "bill_amount": 1000,
+    "customer_account_no": "+9647701234567",
     "status": "Success",
-    "received_at": "2026-05-20 10:05:00"
+    "received_at": "2026-05-20 18:39:25"
   }
 }
 ```
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `data.transaction_id` | integer | Canonical ZiCharge transaction ID. **Use this in your ledger.** |
-| `data.order_id` | string | Your submitted `order_id`. |
-| `data.amount` | string | Credited amount in IQD. |
-| `data.customer_mobile_no` | string | Recipient wallet number. |
+| `data.tx_unique_id` | string | Public transaction reference. **Use this in your ledger and for support queries.** |
+| `data.order_id` | string | The `reference_id` you passed as `order_id`. |
+| `data.bill_amount` | integer | Credited amount in IQD. |
+| `data.customer_account_no` | string | Recipient wallet number. |
 | `data.status` | string | `"Success"` for a settled cashback. |
 | `data.received_at` | string | UTC timestamp `"yyyy-MM-dd HH:mm:ss"`. |
 
@@ -143,23 +139,23 @@ POST /merchant/payment/validation
 
 ## When to call
 
-Because cashback settles synchronously, `transaction_id` is already returned in the [Cashback](cashback.md) response. Validate Payment is useful when:
+Because cashback settles synchronously, `tx_unique_id` is already returned in the [Cashback](cashback.md) response. Validate Payment is useful when:
 
 - You need to **re-fetch** the transaction record after the fact.
-- You want a **single reconciliation pattern** consistent with the deposit flow.
-- Your cashback call timed out and you need to check whether the credit was applied.
+- Your cashback call **timed out** and you need to check whether the credit was applied before retrying.
+- You want a **consistent reconciliation pattern** across both deposit and withdrawal flows.
 
-!!! tip "Always use `transaction_id` in your books"
-    The `transaction_id` is the canonical ZiCharge reference. Include it in all support queries.
+!!! tip "Always record `tx_unique_id`"
+    Include it in all support queries. It is the canonical ZiCharge reference for the transaction.
 
 ---
 
-## Error codes
+## Error responses
 
-| `code` | Meaning | Action |
+| `code` | Message | Action |
 |--------|---------|--------|
-| `200` | Validation complete | Read `data.status` |
-| `401` | Invalid credentials | Check `merchant_mobile_no` and `store_password` |
-| `404` | Order not found | Verify `order_id` is correct |
+| `200` | — | Check `data.status` |
+| `404` | `Transaction not found.` | Verify `order_id` matches the `reference_id` used in Cashback |
+| `422` | `Invalid store credentials.` | Check `merchant_mobile_no` and `store_password` |
 
 [Full error code reference →](../06-error-codes.md)

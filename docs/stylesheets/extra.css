@@ -564,7 +564,117 @@
 
 /* ── Footer ──────────────────────────────────────────────── */
 .md-footer {
-  background: var(--zi-blue-800);
+  background: var(--zi-blue-900);
+}
+
+.md-footer-meta {
+  padding: 0;
+}
+
+.zi-footer-inner {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 3rem;
+  padding: 2.5rem 1.5rem 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .zi-footer-inner {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+.zi-footer-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.zi-footer-logo {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.zi-footer-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--zi-teal-400);
+  background: rgba(0,200,150,0.12);
+  border: 1px solid rgba(0,200,150,0.25);
+  padding: 2px 8px;
+  border-radius: 999px;
+  width: fit-content;
+}
+
+.zi-footer-tagline {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.4);
+  margin: 0.5rem 0 0 !important;
+  line-height: 1.5;
+}
+
+.zi-footer-links {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+@media (max-width: 600px) {
+  .zi-footer-links {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.zi-footer-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.zi-footer-col-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  margin-bottom: 0.25rem;
+}
+
+.zi-footer-col a {
+  font-size: 0.83rem;
+  color: rgba(255,255,255,0.6);
+  text-decoration: none;
+  transition: color 0.14s;
+}
+
+.zi-footer-col a:hover {
+  color: rgba(255,255,255,0.92);
+}
+
+.zi-footer-bottom {
+  border-top: 1px solid rgba(255,255,255,0.07);
+  padding: 0.85rem 1.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.28);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.zi-footer-sep {
+  opacity: 0.4;
 }
 
 /* ── Scrollbar (Chrome/Edge) ─────────────────────────────── */
@@ -1143,7 +1253,7 @@
   opacity: 0.8;
 }
 
-/* ── Section labels ──────────────────────────────────────── */
+/* ── Section labels (legacy — kept for non-home pages) ──── */
 .zi-section-label {
   display: inline-flex;
   align-items: center;
@@ -1168,55 +1278,59 @@
 
 [data-md-color-scheme="slate"] .zi-section-label { color: var(--zi-blue-300); }
 
-/* ── Diagram tabs wrapper (full-width) ───────────────────── */
-.zi-diagram-tabs-wrap {
+/* ── Diagram tabs — at document level (no wrapper div) ───── */
+
+/* Tab label bar — dark header on ALL home page tabbed sets */
+.md-typeset .tabbed-set {
+  border: 1px solid var(--zi-grey-200);
   border-radius: 14px;
   overflow: hidden;
-  border: 1px solid var(--zi-grey-200);
-  margin-bottom: 2.5rem;
+  margin-bottom: 2.5rem !important;
+  margin-top: 0 !important;
 }
 
-/* Tab label bar — dark header */
-.zi-diagram-tabs-wrap .tabbed-set {
-  margin: 0 !important;
-  border-radius: 0 !important;
-}
-
-.zi-diagram-tabs-wrap .tabbed-labels {
+.md-typeset .tabbed-labels {
   background: var(--zi-blue-900) !important;
   border-bottom: 1px solid rgba(255,255,255,0.08) !important;
   padding: 0 1.25rem !important;
   gap: 0 !important;
+  border-radius: 0 !important;
 }
 
-.zi-diagram-tabs-wrap .tabbed-labels > label {
+.md-typeset .tabbed-labels > label {
   color: rgba(255,255,255,0.5) !important;
   font-size: 0.85rem !important;
   font-weight: 600 !important;
-  padding: 0.85rem 1.1rem !important;
+  padding: 0.85rem 1.25rem !important;
   border-bottom: 2px solid transparent !important;
-  margin-right: 0.25rem;
+  margin: 0 !important;
   cursor: pointer;
   transition: color 0.15s, border-color 0.15s;
 }
 
-.zi-diagram-tabs-wrap .tabbed-labels > label:hover {
-  color: rgba(255,255,255,0.8) !important;
+.md-typeset .tabbed-labels > label:hover {
+  color: rgba(255,255,255,0.82) !important;
 }
 
-.zi-diagram-tabs-wrap .tabbed-set input:checked + label {
+.md-typeset .tabbed-set input:checked + label {
   color: #ffffff !important;
   border-bottom-color: var(--zi-teal-400) !important;
 }
 
 /* Tab content area */
-.zi-diagram-tabs-wrap .tabbed-content {
+.md-typeset .tabbed-content {
   background: var(--zi-grey-100);
   padding: 1.5rem 1.75rem 1.25rem !important;
+  border-radius: 0 !important;
 }
 
-.zi-diagram-tabs-wrap .tabbed-block {
+.md-typeset .tabbed-block {
   margin: 0 !important;
+}
+
+/* Code example tabs: lighter background for code blocks */
+.md-typeset .tabbed-content pre {
+  border-radius: 6px !important;
 }
 
 /* Diagram description text */
@@ -1228,29 +1342,34 @@
   max-width: 640px;
 }
 
-/* Make Mermaid diagrams fill width and be readable */
-.zi-diagram-tabs-wrap .mermaid {
+/* Mermaid diagrams — centered and full-width */
+.md-typeset .mermaid {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 280px;
-}
-
-.zi-diagram-tabs-wrap .mermaid svg {
-  max-width: 100% !important;
-  height: auto !important;
   min-height: 260px;
 }
 
-[data-md-color-scheme="slate"] .zi-diagram-tabs-wrap {
+.md-typeset .mermaid svg {
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 240px;
+}
+
+[data-md-color-scheme="slate"] .md-typeset .tabbed-set {
   border-color: rgba(255,255,255,0.08);
 }
 
-[data-md-color-scheme="slate"] .zi-diagram-tabs-wrap .tabbed-content {
+[data-md-color-scheme="slate"] .md-typeset .tabbed-content {
   background: rgba(255,255,255,0.03);
 }
 
 [data-md-color-scheme="slate"] .zi-diagram-desc { color: rgba(255,255,255,0.5); }
+
+/* ── Full-width form row ─────────────────────────────────── */
+.zi-form-row--full {
+  grid-template-columns: 1fr !important;
+}
 
 /* ── API group header ────────────────────────────────────── */
 .zi-api-group-header {
@@ -1357,7 +1476,7 @@
 
 .zi-explorer-cta-text > p {
   font-size: 0.88rem;
-  color: rgba(255,255,255,0.65);
+  color: rgba(255,255,255,0.82);
   line-height: 1.6;
   margin: 0 0 1.25rem !important;
   max-width: 460px;
@@ -1384,7 +1503,7 @@
 
 .zi-explorer-meta {
   font-size: 0.75rem !important;
-  color: rgba(255,255,255,0.35) !important;
+  color: rgba(255,255,255,0.62) !important;
   margin: 0 !important;
   letter-spacing: 0.01em;
 }

@@ -1,6 +1,6 @@
 # Validate Payment
 
-Confirms the final status of a payment by `order_id`. Call this after receiving an IPN callback to obtain the canonical `transaction_id` for your records. Safe to call multiple times.
+Confirms the final status of a payment by `order_id`. Returns the canonical `tx_unique_id` to record in your ledger. Safe to call multiple times.
 
 ---
 
@@ -10,7 +10,7 @@ Confirms the final status of a payment by `order_id`. Call this after receiving 
 POST /merchant/payment/validation
 ```
 
-**Base URLs**
+Also available at alias: `/merchant/validate-payment`
 
 | Environment | Base URL |
 |-------------|----------|
@@ -30,7 +30,7 @@ POST /merchant/payment/validation
       -d '{
         "merchant_mobile_no": "+9647712345678",
         "store_password": "your-store-password",
-        "order_id": "ORD-2026-000123"
+        "order_id": "ORD-2026-000001"
       }'
     ```
 
@@ -43,7 +43,7 @@ POST /merchant/payment/validation
         {
           "merchant_mobile_no": "+9647712345678",
           "store_password": "your-store-password",
-          "order_id": "ORD-2026-000123"
+          "order_id": "ORD-2026-000001"
         }
         """;
 
@@ -63,7 +63,7 @@ POST /merchant/payment/validation
     $payload = [
         'merchant_mobile_no' => '+9647712345678',
         'store_password'     => 'your-store-password',
-        'order_id'           => 'ORD-2026-000123',
+        'order_id'           => 'ORD-2026-000001',
     ];
 
     $ch = curl_init('https://secure.zicharge.com/merchant/payment/validation');
@@ -86,18 +86,14 @@ POST /merchant/payment/validation
       'https://secure.zicharge.com/merchant/payment/validation',
       {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({
           merchant_mobile_no: '+9647712345678',
           store_password: 'your-store-password',
-          order_id: 'ORD-2026-000123',
+          order_id: 'ORD-2026-000001',
         }),
       }
     );
-
     const data = await response.json();
     ```
 
@@ -109,7 +105,7 @@ POST /merchant/payment/validation
 |-----------|------|----------|-------------|
 | `merchant_mobile_no` | string | Required | Your merchant wallet number in E.164 format. |
 | `store_password` | string | Required | Your store password. |
-| `order_id` | string | Required | The order ID you submitted when minting the token. |
+| `order_id` | string | Required | The `order_id` you submitted when minting the token. |
 
 ---
 
@@ -120,11 +116,11 @@ POST /merchant/payment/validation
     ```json
     {
       "code": 200,
-      "messages": ["Successfully Deposited."],
+      "messages": ["Please find your transaction details."],
       "data": {
-        "transaction_id": 123456,
-        "order_id": "ORD-2026-000123",
-        "bill_amount": "5000",
+        "tx_unique_id": "CVIBAON916",
+        "order_id": "ORD-2026-000001",
+        "bill_amount": 1000,
         "customer_account_no": "+9647701234567",
         "status": "Success",
         "received_at": "2026-05-20 10:00:00"
@@ -132,48 +128,60 @@ POST /merchant/payment/validation
     }
     ```
 
-=== "Cancelled / Not paid"
+=== "Cancelled"
 
     ```json
     {
       "code": 200,
-      "messages": ["Payment not completed."],
+      "messages": ["Please find your transaction details."],
       "data": {
-        "order_id": "ORD-2026-000123",
-        "status": "Cancelled"
+        "tx_unique_id": "CVIBAON916",
+        "order_id": "ORD-2026-000001",
+        "bill_amount": 1000,
+        "customer_account_no": "+9647701234567",
+        "status": "Cancelled",
+        "received_at": "2026-05-20 10:05:00"
       }
+    }
+    ```
+
+=== "Not found"
+
+    ```json
+    {
+      "code": 404,
+      "messages": ["Transaction not found."],
+      "data": null
     }
     ```
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `data.transaction_id` | integer | Canonical ZiCharge transaction ID. **Use this in your ledger.** |
+| `data.tx_unique_id` | string | Public transaction reference. **Use this in your ledger and for support queries.** |
 | `data.order_id` | string | Your original order ID. |
-| `data.bill_amount` | string | Amount in IQD as a string. |
-| `data.customer_account_no` | string | The paying customer's mobile number. |
+| `data.bill_amount` | integer | Amount in IQD. |
+| `data.customer_account_no` | string | The paying customer's wallet number. |
 | `data.status` | string | `"Success"` or `"Cancelled"`. |
-| `data.received_at` | string | UTC timestamp of the transaction `"yyyy-MM-dd HH:mm:ss"`. |
+| `data.received_at` | string | UTC timestamp `"yyyy-MM-dd HH:mm:ss"`. |
 
 ---
 
 ## When to call
 
-Call Validate Payment in two scenarios:
+1. **After receiving an IPN callback** — to independently confirm the payment and record `tx_unique_id`.
+2. **Missed IPN recovery** — if your listener was down during both delivery attempts, poll this endpoint to reconcile.
 
-1. **After receiving an IPN callback** — to confirm the transaction and record `transaction_id` in your books.
-2. **Missed IPN recovery** — if your IPN listener was unavailable during both delivery attempts, poll this endpoint to reconcile the order status.
-
-!!! tip "Always use `transaction_id` in your books"
-    The `transaction_id` returned here is the canonical ZiCharge reference. Record it against your order for support queries and reconciliation.
+!!! tip "Always record `tx_unique_id`"
+    This is the canonical ZiCharge public reference. Always store it against your order and include it in any support requests.
 
 ---
 
-## Error codes
+## Error responses
 
-| `code` | Meaning | Action |
+| `code` | Message | Action |
 |--------|---------|--------|
-| `200` | Validation complete | Read `data.status` for the outcome |
-| `401` | Invalid credentials | Check `merchant_mobile_no` and `store_password` |
-| `404` | Order not found | Verify `order_id` is correct |
+| `200` | — | Check `data.status` for `Success` or `Cancelled` |
+| `404` | `Transaction not found.` | Verify `order_id` is correct and the token was ever paid |
+| `422` | `Invalid store credentials.` | Check `merchant_mobile_no` and `store_password` |
 
 [Full error code reference →](../06-error-codes.md)

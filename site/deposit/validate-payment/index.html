@@ -708,10 +708,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#error-codes" class="md-nav__link">
+  <a href="#error-responses" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Error codes
+        Error responses
       
     </span>
   </a>
@@ -1047,10 +1047,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#error-codes" class="md-nav__link">
+  <a href="#error-responses" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Error codes
+        Error responses
       
     </span>
   </a>
@@ -1075,12 +1075,12 @@
 
 
 <h1 id="validate-payment">Validate Payment<a class="headerlink" href="#validate-payment" title="Permanent link">&para;</a></h1>
-<p>Confirms the final status of a payment by <code>order_id</code>. Call this after receiving an IPN callback to obtain the canonical <code>transaction_id</code> for your records. Safe to call multiple times.</p>
+<p>Confirms the final status of a payment by <code>order_id</code>. Returns the canonical <code>tx_unique_id</code> to record in your ledger. Safe to call multiple times.</p>
 <hr />
 <h2 id="endpoint">Endpoint<a class="headerlink" href="#endpoint" title="Permanent link">&para;</a></h2>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>POST /merchant/payment/validation
 </span></code></pre></div>
-<p><strong>Base URLs</strong></p>
+<p>Also available at alias: <code>/merchant/validate-payment</code></p>
 <table>
 <thead>
 <tr>
@@ -1110,7 +1110,7 @@
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{</span>
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="s1">    &quot;merchant_mobile_no&quot;: &quot;+9647712345678&quot;,</span>
 </span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="s1">    &quot;store_password&quot;: &quot;your-store-password&quot;,</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="s1">    &quot;order_id&quot;: &quot;ORD-2026-000123&quot;</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="s1">    &quot;order_id&quot;: &quot;ORD-2026-000001&quot;</span>
 </span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="s1">  }&#39;</span>
 </span></code></pre></div>
 </div>
@@ -1121,7 +1121,7 @@
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="s">    {</span>
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="s">      &quot;merchant_mobile_no&quot;: &quot;+9647712345678&quot;,</span>
 </span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="s">      &quot;store_password&quot;: &quot;your-store-password&quot;,</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="s">      &quot;order_id&quot;: &quot;ORD-2026-000123&quot;</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="s">      &quot;order_id&quot;: &quot;ORD-2026-000001&quot;</span>
 </span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="s">    }</span>
 </span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="s">    &quot;&quot;&quot;</span><span class="p">;</span>
 </span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>
@@ -1139,7 +1139,7 @@
 <div class="language-php highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="x">$payload = [</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="x">    &#39;merchant_mobile_no&#39; =&gt; &#39;+9647712345678&#39;,</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="x">    &#39;store_password&#39;     =&gt; &#39;your-store-password&#39;,</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="x">    &#39;order_id&#39;           =&gt; &#39;ORD-2026-000123&#39;,</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="x">    &#39;order_id&#39;           =&gt; &#39;ORD-2026-000001&#39;,</span>
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="x">];</span>
 </span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
 </span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="x">$ch = curl_init(&#39;https://secure.zicharge.com/merchant/payment/validation&#39;);</span>
@@ -1160,19 +1160,15 @@
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="s1">&#39;https://secure.zicharge.com/merchant/payment/validation&#39;</span><span class="p">,</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="p">{</span>
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="nx">method</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;POST&#39;</span><span class="p">,</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="nx">headers</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">      </span><span class="s1">&#39;Content-Type&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;application/json&#39;</span><span class="p">,</span>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">      </span><span class="s1">&#39;Accept&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;application/json&#39;</span><span class="p">,</span>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">    </span><span class="p">},</span>
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">    </span><span class="nx">body</span><span class="o">:</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span>
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">      </span><span class="nx">merchant_mobile_no</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;+9647712345678&#39;</span><span class="p">,</span>
-</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">      </span><span class="nx">store_password</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;your-store-password&#39;</span><span class="p">,</span>
-</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">      </span><span class="nx">order_id</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ORD-2026-000123&#39;</span><span class="p">,</span>
-</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">    </span><span class="p">}),</span>
-</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="p">);</span>
-</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>
-</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="kd">const</span><span class="w"> </span><span class="nx">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">response</span><span class="p">.</span><span class="nx">json</span><span class="p">();</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="nx">headers</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s1">&#39;Content-Type&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;application/json&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;Accept&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;application/json&#39;</span><span class="w"> </span><span class="p">},</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="nx">body</span><span class="o">:</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">      </span><span class="nx">merchant_mobile_no</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;+9647712345678&#39;</span><span class="p">,</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">      </span><span class="nx">store_password</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;your-store-password&#39;</span><span class="p">,</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">      </span><span class="nx">order_id</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ORD-2026-000001&#39;</span><span class="p">,</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">    </span><span class="p">}),</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="p">);</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="kd">const</span><span class="w"> </span><span class="nx">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">response</span><span class="p">.</span><span class="nx">json</span><span class="p">();</span>
 </span></code></pre></div>
 </div>
 </div>
@@ -1205,22 +1201,22 @@
 <td><code>order_id</code></td>
 <td>string</td>
 <td>Required</td>
-<td>The order ID you submitted when minting the token.</td>
+<td>The <code>order_id</code> you submitted when minting the token.</td>
 </tr>
 </tbody>
 </table>
 <hr />
 <h2 id="response">Response<a class="headerlink" href="#response" title="Permanent link">&para;</a></h2>
-<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Success</label><label for="__tabbed_2_2">Cancelled / Not paid</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:3"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><input id="__tabbed_2_3" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Success</label><label for="__tabbed_2_2">Cancelled</label><label for="__tabbed_2_3">Not found</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="language-json highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">{</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nt">&quot;messages&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;Successfully Deposited.&quot;</span><span class="p">],</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nt">&quot;messages&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;Please find your transaction details.&quot;</span><span class="p">],</span>
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="nt">&quot;transaction_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">123456</span><span class="p">,</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="nt">&quot;order_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ORD-2026-000123&quot;</span><span class="p">,</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="nt">&quot;bill_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;5000&quot;</span><span class="p">,</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="nt">&quot;tx_unique_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CVIBAON916&quot;</span><span class="p">,</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="nt">&quot;order_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ORD-2026-000001&quot;</span><span class="p">,</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="nt">&quot;bill_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1000</span><span class="p">,</span>
 </span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="nt">&quot;customer_account_no&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;+9647701234567&quot;</span><span class="p">,</span>
 </span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">    </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Success&quot;</span><span class="p">,</span>
 </span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">    </span><span class="nt">&quot;received_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-05-20 10:00:00&quot;</span>
@@ -1231,12 +1227,24 @@
 <div class="tabbed-block">
 <div class="language-json highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">{</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="nt">&quot;messages&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;Payment not completed.&quot;</span><span class="p">],</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="nt">&quot;messages&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;Please find your transaction details.&quot;</span><span class="p">],</span>
 </span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="nt">&quot;order_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ORD-2026-000123&quot;</span><span class="p">,</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Cancelled&quot;</span>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="p">}</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="nt">&quot;tx_unique_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CVIBAON916&quot;</span><span class="p">,</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="nt">&quot;order_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ORD-2026-000001&quot;</span><span class="p">,</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">    </span><span class="nt">&quot;bill_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1000</span><span class="p">,</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">    </span><span class="nt">&quot;customer_account_no&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;+9647701234567&quot;</span><span class="p">,</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">    </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Cancelled&quot;</span><span class="p">,</span>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">    </span><span class="nt">&quot;received_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-05-20 10:05:00&quot;</span>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="language-json highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="p">{</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">404</span><span class="p">,</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="nt">&quot;messages&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;Transaction not found.&quot;</span><span class="p">],</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="p">}</span>
 </span></code></pre></div>
 </div>
 </div>
@@ -1251,9 +1259,9 @@
 </thead>
 <tbody>
 <tr>
-<td><code>data.transaction_id</code></td>
-<td>integer</td>
-<td>Canonical ZiCharge transaction ID. <strong>Use this in your ledger.</strong></td>
+<td><code>data.tx_unique_id</code></td>
+<td>string</td>
+<td>Public transaction reference. <strong>Use this in your ledger and for support queries.</strong></td>
 </tr>
 <tr>
 <td><code>data.order_id</code></td>
@@ -1262,13 +1270,13 @@
 </tr>
 <tr>
 <td><code>data.bill_amount</code></td>
-<td>string</td>
-<td>Amount in IQD as a string.</td>
+<td>integer</td>
+<td>Amount in IQD.</td>
 </tr>
 <tr>
 <td><code>data.customer_account_no</code></td>
 <td>string</td>
-<td>The paying customer's mobile number.</td>
+<td>The paying customer's wallet number.</td>
 </tr>
 <tr>
 <td><code>data.status</code></td>
@@ -1278,46 +1286,45 @@
 <tr>
 <td><code>data.received_at</code></td>
 <td>string</td>
-<td>UTC timestamp of the transaction <code>"yyyy-MM-dd HH:mm:ss"</code>.</td>
+<td>UTC timestamp <code>"yyyy-MM-dd HH:mm:ss"</code>.</td>
 </tr>
 </tbody>
 </table>
 <hr />
 <h2 id="when-to-call">When to call<a class="headerlink" href="#when-to-call" title="Permanent link">&para;</a></h2>
-<p>Call Validate Payment in two scenarios:</p>
 <ol>
-<li><strong>After receiving an IPN callback</strong> — to confirm the transaction and record <code>transaction_id</code> in your books.</li>
-<li><strong>Missed IPN recovery</strong> — if your IPN listener was unavailable during both delivery attempts, poll this endpoint to reconcile the order status.</li>
+<li><strong>After receiving an IPN callback</strong> — to independently confirm the payment and record <code>tx_unique_id</code>.</li>
+<li><strong>Missed IPN recovery</strong> — if your listener was down during both delivery attempts, poll this endpoint to reconcile.</li>
 </ol>
 <div class="admonition tip">
-<p class="admonition-title">Always use <code>transaction_id</code> in your books</p>
-<p>The <code>transaction_id</code> returned here is the canonical ZiCharge reference. Record it against your order for support queries and reconciliation.</p>
+<p class="admonition-title">Always record <code>tx_unique_id</code></p>
+<p>This is the canonical ZiCharge public reference. Always store it against your order and include it in any support requests.</p>
 </div>
 <hr />
-<h2 id="error-codes">Error codes<a class="headerlink" href="#error-codes" title="Permanent link">&para;</a></h2>
+<h2 id="error-responses">Error responses<a class="headerlink" href="#error-responses" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
 <th><code>code</code></th>
-<th>Meaning</th>
+<th>Message</th>
 <th>Action</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>200</code></td>
-<td>Validation complete</td>
-<td>Read <code>data.status</code> for the outcome</td>
-</tr>
-<tr>
-<td><code>401</code></td>
-<td>Invalid credentials</td>
-<td>Check <code>merchant_mobile_no</code> and <code>store_password</code></td>
+<td>—</td>
+<td>Check <code>data.status</code> for <code>Success</code> or <code>Cancelled</code></td>
 </tr>
 <tr>
 <td><code>404</code></td>
-<td>Order not found</td>
-<td>Verify <code>order_id</code> is correct</td>
+<td><code>Transaction not found.</code></td>
+<td>Verify <code>order_id</code> is correct and the token was ever paid</td>
+</tr>
+<tr>
+<td><code>422</code></td>
+<td><code>Invalid store credentials.</code></td>
+<td>Check <code>merchant_mobile_no</code> and <code>store_password</code></td>
 </tr>
 </tbody>
 </table>

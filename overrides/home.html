@@ -1,21 +1,111 @@
 {% extends "main.html" %}
 
+{% block styles %}
+{{ super() }}
+<style>
+  /* ── Suppress the default "Home" H1 page title ───────── */
+  .md-typeset h1:first-child {
+    display: none;
+  }
+
+  /* ── Home page H2 → styled as prominent section labels ── */
+  .md-typeset h2 {
+    font-size: 0.72rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.12em !important;
+    text-transform: uppercase !important;
+    color: var(--zi-blue-600) !important;
+    border-bottom: none !important;
+    padding: 0 !important;
+    margin: 2.75rem 0 1.25rem !important;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .md-typeset h2::before {
+    content: "";
+    display: inline-block;
+    width: 3px;
+    height: 1em;
+    background: var(--zi-teal-500);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  [data-md-color-scheme="slate"] .md-typeset h2 {
+    color: var(--zi-teal-400) !important;
+  }
+
+  /* ── Section intro line ──────────────────────────────── */
+  .zi-section-intro {
+    font-size: 0.93rem;
+    color: var(--zi-grey-600);
+    line-height: 1.65;
+    margin: -0.5rem 0 1.5rem !important;
+    max-width: 680px;
+  }
+
+  [data-md-color-scheme="slate"] .zi-section-intro {
+    color: rgba(255,255,255,0.55);
+  }
+
+  /* ── Hero wave separator ─────────────────────────────── */
+  .zi-hero::after {
+    content: "";
+    display: block;
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 48px;
+    background: var(--md-default-bg-color, #fff);
+    clip-path: ellipse(56% 100% at 50% 100%);
+  }
+
+  /* ── Normalize CTA buttons ───────────────────────────── */
+  .zi-btn--ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.65rem 1.6rem;
+    font-size: 0.92rem;
+    font-weight: 600;
+  }
+
+  .zi-btn--ghost svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    opacity: 0.85;
+  }
+
+  /* ── Full-width form row ─────────────────────────────── */
+  .zi-form-row--full {
+    grid-template-columns: 1fr !important;
+  }
+</style>
+{% endblock %}
+
 {% block tabs %}{{ super() }}{% endblock %}
 
 {% block hero %}
 <div class="zi-hero">
   <div class="zi-hero__grid-bg"></div>
   <div class="zi-hero__inner">
-    <div class="zi-hero__badge">Merchant Payment Gateway &nbsp;·&nbsp; Developer Documentation</div>
+    <div class="zi-hero__badge">Developer Documentation</div>
     <h1 class="zi-hero__title">Accept Payments with<br><span class="zi-hero__title-accent">ZiCharge</span></h1>
     <p class="zi-hero__subtitle">
       Integrate the ZiCharge wallet payment gateway into your platform in hours.
-      Hosted checkout, direct charge, QR flow, and cashback — all on a single API.
+      Hosted checkout, QR flow, and cashback disbursement — all on a single API.
     </p>
     <div class="zi-hero__actions">
       <a href="deposit/initiate-payment/" class="zi-btn zi-btn--primary zi-btn--lg">Get started</a>
       <a href="api-explorer/" class="zi-btn zi-btn--ghost zi-btn--lg">
-        <span class="zi-btn-icon">▶</span> Try the API
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 4l5 4-5 4V4z" fill="currentColor"/>
+        </svg>
+        Try the API
       </a>
     </div>
     <div class="zi-hero__stats">
@@ -25,7 +115,7 @@
       </div>
       <div class="zi-stat__divider"></div>
       <div class="zi-stat">
-        <span class="zi-stat__num">3</span>
+        <span class="zi-stat__num">6</span>
         <span class="zi-stat__label">API endpoints</span>
       </div>
       <div class="zi-stat__divider"></div>

@@ -1,33 +1,209 @@
 {% extends "main.html" %}
 
+{# ZiCharge API Explorer — Scalar with CORS proxy, flex-chain full-bleed layout #}
 {% block styles %}
 {{ super() }}
 <style>
-  .zi-explorer-wrap {
+  /* ── Flex chain: stretch every ancestor from html down to our
+     explorer so it fills exactly the space below MkDocs header+tabs
+     without any hardcoded pixel offsets or position:fixed tricks.
+     overflow:hidden on each level prevents page-level scrollbars.  ── */
+
+  html, body {
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+  /* MkDocs container sits below the sticky header+tabs */
+  .md-container {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+  .md-main {
+    flex: 1 1 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    padding-top: 0 !important;
+    overflow: hidden !important;
+  }
+  /* md-main__inner also carries the md-grid class (max-width: 61rem).
+     We override both max-width and the grid gap so content is full-width. */
+  .md-main__inner {
+    flex: 1 1 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+  .md-content {
+    flex: 1 1 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    overflow: hidden !important;
+  }
+  /* md-content__inner is the <article> Material renders;
+     it has padding: 1.2rem 0.8rem 6rem and max-width: 61rem by default */
+  .md-content__inner {
+    flex: 1 1 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+    overflow: hidden !important;
+  }
+
+  /* ── Explorer shell fills everything left after header+tabs ── */
+  .zi-explorer-page {
+    flex: 1 1 0;
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 48px);
     overflow: hidden;
+    width: 100%;
   }
-  .zi-explorer-notice {
+
+  /* ── Top bar ──────────────────────────────────────────── */
+  .zi-explorer-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     background: #0d1e3a;
-    color: rgba(255,255,255,0.75);
-    font-size: 0.78rem;
-    padding: 0.45rem 1.25rem;
+    padding: 0.5rem 1.25rem;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    flex-shrink: 0;
+    gap: 1rem;
+    flex-wrap: wrap;
+    z-index: 10;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .zi-explorer-topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+  }
+
+  /* Status pills */
+  .zi-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    line-height: 1;
+  }
+  .zi-pill--live {
+    background: rgba(0,179,134,0.15);
+    color: #4adeab;
+    border: 1px solid rgba(0,179,134,0.3);
+  }
+  .zi-pill--proxy {
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.55);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .zi-pill__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: #00b386;
+    box-shadow: 0 0 0 3px rgba(0,179,134,0.22);
+  }
+  .zi-pill__icon {
+    width: 10px;
+    height: 10px;
+    flex-shrink: 0;
+    opacity: 0.7;
+  }
+
+  /* Top bar notice */
+  .zi-topbar-notice {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.72rem;
+    line-height: 1.3;
+  }
+  .zi-topbar-notice strong { color: rgba(255,255,255,0.78); font-weight: 600; }
+  .zi-topbar-notice code {
+    background: rgba(255,255,255,0.1);
+    color: #a5f3d5;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 0.68rem;
+  }
+  .zi-topbar-sep {
+    color: rgba(255,255,255,0.2);
+    margin: 0 0.15rem;
+  }
+
+  /* ── Action buttons ───────────────────────────────────── */
+  .zi-topbar-actions {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
     flex-shrink: 0;
   }
-  .zi-explorer-notice strong { color: #00c896; }
-  rapi-doc {
-    flex: 1;
+  .zi-topbar-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.38rem;
+    padding: 0.35rem 0.88rem;
+    border-radius: 6px;
+    font-size: 0.74rem;
+    font-weight: 600;
+    text-decoration: none !important;
+    white-space: nowrap;
+    transition: background 0.15s, color 0.15s;
+    border: none;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .zi-topbar-btn--postman {
+    background: #ff6c37;
+    color: #fff !important;
+  }
+  .zi-topbar-btn--postman:hover { background: #e85d29; }
+  .zi-topbar-btn--ghost {
+    background: rgba(255,255,255,0.07);
+    color: rgba(255,255,255,0.82) !important;
+    border: 1px solid rgba(255,255,255,0.13);
+  }
+  .zi-topbar-btn--ghost:hover { background: rgba(255,255,255,0.13); color: #fff !important; }
+  .zi-topbar-btn-icon { width: 13px; height: 13px; flex-shrink: 0; }
+
+  /* ── Scalar container — fills all remaining height/width ─ */
+  #zi-scalar-root {
+    flex: 1 1 0;
     min-height: 0;
-    overflow: auto;
-    --green: #00b386;
-    --blue: #1b6ca8;
-    --font-size-regular: 14px;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    background: #f8fafc;
+    /*
+      transform creates a new CSS "containing block" for position:fixed
+      descendants (per CSS spec §9.3). Without this, Scalar's internal
+      fixed header anchors to the viewport top and covers our topbar.
+      With this, Scalar's fixed elements anchor to #zi-scalar-root instead.
+    */
+    transform: translateZ(0);
+  }
+  /* Scalar mounts a single div after the #api-reference script */
+  #zi-scalar-root > div {
+    width: 100% !important;
+    height: 100% !important;
   }
 </style>
 {% endblock %}
@@ -35,48 +211,165 @@
 {% block tabs %}{{ super() }}{% endblock %}
 
 {% block content %}
-<div class="zi-explorer-wrap">
-  <div class="zi-explorer-notice">
-    <strong>Sandbox mode:</strong>&nbsp;Select the Sandbox server in the explorer to test without moving real funds.
-    &nbsp;|&nbsp; All calls must be made <strong>server-side</strong> — never expose your <code>store_password</code> in client code.
-  </div>
-  <rapi-doc
-    id="zi-rapidoc"
-    spec-url="/zc-paymentgw-developer-docs/assets/openapi.yaml"
-    theme="light"
-    bg-color="#ffffff"
-    text-color="#0A1628"
-    header-color="#0A1628"
-    primary-color="#1B6CA8"
-    nav-bg-color="#0D1E3A"
-    nav-text-color="rgba(255,255,255,0.75)"
-    nav-hover-bg-color="#1B3D6F"
-    nav-hover-text-color="#ffffff"
-    nav-accent-color="#00B386"
-    nav-item-spacing="relaxed"
-    render-style="read"
-    schema-style="tree"
-    schema-description-expanded="true"
-    default-schema-tab="example"
-    response-area-height="400px"
-    show-header="false"
-    allow-try="true"
-    allow-server-selection="true"
-    server-url="https://dev.zicharge.com"
-    show-components="false"
-    show-info="true"
-    allow-authentication="false"
-    sort-tags="false"
-    sort-endpoints-by="none"
-    goto-path="/"
-  >
-    <div slot="nav-logo" style="display:flex;align-items:center;padding:1rem 1rem 0.5rem;gap:0.6rem;">
-      <span style="font-size:1.05rem;font-weight:700;color:#fff;letter-spacing:-0.01em;">ZiCharge</span>
-      <span style="font-size:0.72rem;background:#00b386;color:#fff;padding:2px 7px;border-radius:20px;font-weight:600;">API</span>
+<div class="zi-explorer-page">
+
+  <!-- ── Top bar ─────────────────────────────────────────── -->
+  <div class="zi-explorer-topbar">
+    <div class="zi-explorer-topbar-left">
+
+      <!-- Status pills -->
+      <span class="zi-pill zi-pill--live">
+        <span class="zi-pill__dot"></span>
+        Live testing
+      </span>
+      <span class="zi-pill zi-pill--proxy">
+        <!-- Globe icon -->
+        <svg class="zi-pill__icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"/>
+          <path d="M2 8h12M8 2c-1.5 2-2 4-2 6s.5 4 2 6M8 2c1.5 2 2 4 2 6s-.5 4-2 6" stroke="currentColor" stroke-width="1.1"/>
+        </svg>
+        CORS proxy
+      </span>
+
+      <!-- Contextual notice -->
+      <span class="zi-topbar-notice">
+        Requests route via <strong>proxy.scalar.com</strong> to bypass browser CORS
+        <span class="zi-topbar-sep">·</span>
+        Select <strong>Sandbox</strong> server — no real funds
+        <span class="zi-topbar-sep">·</span>
+        Never expose <code>store_password</code> or <code>api_key</code> client-side
+      </span>
     </div>
-  </rapi-doc>
+
+    <div class="zi-topbar-actions">
+      <!-- Run in Postman -->
+      <a class="zi-topbar-btn zi-topbar-btn--postman"
+         href="https://app.getpostman.com/run-collection/2048354-f315f5be-8e60-428f-ae88-04d75011b292"
+         target="_blank" rel="noopener">
+        <svg class="zi-topbar-btn-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="16" cy="16" r="16" fill="#FF6C37"/>
+          <path d="M13 10.5l8 5.5-8 5.5v-11z" fill="#fff"/>
+        </svg>
+        Run in Postman
+      </a>
+      <!-- Download collection -->
+      <a class="zi-topbar-btn zi-topbar-btn--ghost"
+         href="/zc-paymentgw-developer-docs/assets/postman/ZiCharge-Merchant-API.postman_collection.json"
+         download>
+        <svg class="zi-topbar-btn-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 1v8.5M8 9.5l-2.5-2.5M8 9.5l2.5-2.5M2.5 12.5h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Download Collection
+      </a>
+    </div>
+  </div>
+
+  <!-- ── Scalar API Reference (live, CORS-proxied) ─────── -->
+  <div id="zi-scalar-root">
+    <!--
+      Scalar mounts immediately after this script tag inside #zi-scalar-root.
+      proxyUrl enables real API calls from the browser by routing through proxy.scalar.com.
+    -->
+    <script
+      id="api-reference"
+      data-url="/zc-paymentgw-developer-docs/assets/openapi.yaml"
+    ></script>
+  </div>
+
 </div>
-<script type="module" src="https://unpkg.com/rapidoc@9.3.4/dist/rapidoc-min.js"></script>
+
+<!-- Scalar configuration — set before loading the library -->
+<script>
+  document.getElementById('api-reference').dataset.configuration = JSON.stringify({
+    /* ── Spec source ─────────────────────────────────── */
+    url: '/zc-paymentgw-developer-docs/assets/openapi.yaml',
+
+    /* ── CORS proxy — enables live browser testing ───── */
+    proxyUrl: 'https://proxy.scalar.com',
+
+    /* ── Layout & theme ──────────────────────────────── */
+    theme: 'default',
+    layout: 'modern',
+    darkMode: false,
+    hideDarkModeToggle: false,
+    showSidebar: true,
+    hideModels: false,
+    hideDownloadButton: false,
+
+    /* ── Default code example language ──────────────── */
+    defaultHttpClient: {
+      targetKey: 'shell',
+      clientKey: 'curl'
+    },
+
+    /* ── Pre-select Bearer auth scheme ──────────────── */
+    authentication: {
+      preferredSecurityScheme: 'BearerAuth',
+      http: {
+        bearer: {
+          token: ''
+        }
+      }
+    },
+
+    /* ── Brand CSS injected into Scalar component ───── */
+    customCss: `
+      /* ── Accent and base palette ─────────────────── */
+      :root {
+        --scalar-color-accent:    #00b386;
+        --scalar-background-1:    #f8fafc;
+        --scalar-background-2:    #ffffff;
+        --scalar-background-3:    #f1f5f9;
+        --scalar-color-1:         #0a1628;
+        --scalar-color-2:         #3d5068;
+        --scalar-color-3:         #8097ae;
+        --scalar-border-color:    #e2e8f0;
+        --scalar-font:            'Inter', system-ui, sans-serif;
+        --scalar-font-code:       'JetBrains Mono', ui-monospace, monospace;
+      }
+
+      /* ── Sidebar — ZiCharge dark blue ─────────────── */
+      :root {
+        --scalar-sidebar-background-1:        #0d1e3a;
+        --scalar-sidebar-color-1:             rgba(255,255,255,0.82);
+        --scalar-sidebar-color-2:             rgba(255,255,255,0.45);
+        --scalar-sidebar-color-active:        #ffffff;
+        --scalar-sidebar-color-accent:        #00b386;
+        --scalar-sidebar-border-color:        rgba(255,255,255,0.08);
+        --scalar-sidebar-search-background:   rgba(255,255,255,0.07);
+        --scalar-sidebar-search-border-color: rgba(255,255,255,0.12);
+        --scalar-sidebar-search-color:        rgba(255,255,255,0.65);
+      }
+
+      /* ── HTTP method badge colours ────────────────── */
+      .post-method   { --scalar-color-accent: #059669 !important; }
+      .get-method    { --scalar-color-accent: #1b6ca8 !important; }
+      .delete-method { --scalar-color-accent: #dc2626 !important; }
+      .put-method    { --scalar-color-accent: #d97706 !important; }
+      .patch-method  { --scalar-color-accent: #7c3aed !important; }
+
+      /* ── Send button ──────────────────────────────── */
+      button[data-testid="send-request-button"],
+      button.send-request {
+        background: #00b386 !important;
+        border-color: #009972 !important;
+      }
+      button[data-testid="send-request-button"]:hover,
+      button.send-request:hover {
+        background: #009972 !important;
+      }
+    `
+  })
+</script>
+
+<!--
+  Scalar API Reference CDN.
+  Pin format: @1 tracks latest stable 1.x; bump to @2 only after verifying breaking changes.
+  If a specific version is needed, use e.g. @1.25.0 and test before deploying.
+-->
+<script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference@1"
+        crossorigin="anonymous"></script>
+
 {% endblock %}
 
 {% block sidebar %}{% endblock %}

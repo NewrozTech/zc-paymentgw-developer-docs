@@ -1,6 +1,6 @@
 # Initiate Payment
 
-Generate a payment token for a customer order. The token powers the hosted checkout page — redirect the customer to it after minting.
+Mint a single-use payment token and checkout URL for a customer order. Redirect the customer to `payment_url` or display it as a QR code. The token expires after `expires_in_minutes` minutes.
 
 ---
 
@@ -10,7 +10,7 @@ Generate a payment token for a customer order. The token powers the hosted check
 POST /merchant/generate-payment-token
 ```
 
-**Base URLs**
+Also available at alias: `/merchant/generate-qr-token`
 
 | Environment | Base URL |
 |-------------|----------|
@@ -30,11 +30,12 @@ POST /merchant/generate-payment-token
       -d '{
         "merchant_mobile_no": "+9647712345678",
         "store_password": "your-store-password",
-        "order_id": "ORD-2026-000123",
-        "bill_amount": 5000,
-        "success_url": "https://yoursite.com/orders/123/success",
-        "cancel_url": "https://yoursite.com/orders/123/cancel",
-        "ipn_url": "https://yoursite.com/webhooks/zicharge/ipn"
+        "order_id": "ORD-2026-000001",
+        "bill_amount": 1000,
+        "success_url": "https://yoursite.com/payment/success",
+        "cancel_url": "https://yoursite.com/payment/cancel",
+        "fail_url": "https://yoursite.com/payment/fail",
+        "customer_mobile_no": "+9647701234567"
       }'
     ```
 
@@ -47,11 +48,12 @@ POST /merchant/generate-payment-token
         {
           "merchant_mobile_no": "+9647712345678",
           "store_password": "your-store-password",
-          "order_id": "ORD-2026-000123",
-          "bill_amount": 5000,
-          "success_url": "https://yoursite.com/orders/123/success",
-          "cancel_url": "https://yoursite.com/orders/123/cancel",
-          "ipn_url": "https://yoursite.com/webhooks/zicharge/ipn"
+          "order_id": "ORD-2026-000001",
+          "bill_amount": 1000,
+          "success_url": "https://yoursite.com/payment/success",
+          "cancel_url": "https://yoursite.com/payment/cancel",
+          "fail_url": "https://yoursite.com/payment/fail",
+          "customer_mobile_no": "+9647701234567"
         }
         """;
 
@@ -71,11 +73,12 @@ POST /merchant/generate-payment-token
     $payload = [
         'merchant_mobile_no' => '+9647712345678',
         'store_password'     => 'your-store-password',
-        'order_id'           => 'ORD-2026-000123',
-        'bill_amount'        => 5000,
-        'success_url'        => 'https://yoursite.com/orders/123/success',
-        'cancel_url'         => 'https://yoursite.com/orders/123/cancel',
-        'ipn_url'            => 'https://yoursite.com/webhooks/zicharge/ipn',
+        'order_id'           => 'ORD-2026-000001',
+        'bill_amount'        => 1000,
+        'success_url'        => 'https://yoursite.com/payment/success',
+        'cancel_url'         => 'https://yoursite.com/payment/cancel',
+        'fail_url'           => 'https://yoursite.com/payment/fail',
+        'customer_mobile_no' => '+9647701234567',
     ];
 
     $ch = curl_init('https://secure.zicharge.com/merchant/generate-payment-token');
@@ -98,22 +101,19 @@ POST /merchant/generate-payment-token
       'https://secure.zicharge.com/merchant/generate-payment-token',
       {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({
           merchant_mobile_no: '+9647712345678',
           store_password: 'your-store-password',
-          order_id: 'ORD-2026-000123',
-          bill_amount: 5000,
-          success_url: 'https://yoursite.com/orders/123/success',
-          cancel_url: 'https://yoursite.com/orders/123/cancel',
-          ipn_url: 'https://yoursite.com/webhooks/zicharge/ipn',
+          order_id: 'ORD-2026-000001',
+          bill_amount: 1000,
+          success_url: 'https://yoursite.com/payment/success',
+          cancel_url: 'https://yoursite.com/payment/cancel',
+          fail_url: 'https://yoursite.com/payment/fail',
+          customer_mobile_no: '+9647701234567',
         }),
       }
     );
-
     const data = await response.json();
     ```
 
@@ -126,61 +126,57 @@ POST /merchant/generate-payment-token
 | `merchant_mobile_no` | string | Required | Your merchant wallet number in E.164 format, e.g. `+9647712345678`. |
 | `store_password` | string | Required | Your store password. Never expose this in client-side code. |
 | `order_id` | string | Required | Your unique order identifier. The same `order_id` will not create a duplicate charge. |
-| `bill_amount` | number | Required | Amount in IQD. Minimum 250. Validated with `BigDecimal` precision — no floating-point rounding. |
+| `bill_amount` | number | Required | Amount in IQD. Minimum 250. |
 | `success_url` | string | Required | URL the customer is redirected to after a successful payment. |
-| `cancel_url` | string | Required | URL the customer is redirected to after cancelling. |
-| `ipn_url` | string | Optional | Your IPN listener endpoint. Must be HTTPS. Overrides the default set in your dashboard. |
+| `cancel_url` | string | Required | URL the customer is redirected to after cancellation. |
+| `fail_url` | string | Optional | URL the customer is redirected to after a failed payment attempt. |
+| `customer_mobile_no` | string | Optional | Pre-fills the customer's wallet number on the checkout page. |
 
 ---
 
 ## Response
 
-Every response returns HTTP 200. The logical outcome is in the `code` field.
-
 ```json
 {
   "code": 200,
-  "messages": ["Token generated successfully."],
+  "messages": [],
   "data": {
-    "payment_token": "tok_a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4",
-    "redirect_url": "https://secure.zicharge.com/merchant/payment?token=tok_a1b2c3d4...",
-    "order_id": "ORD-2026-000123",
-    "expires_in_seconds": 900
+    "token": "PMTKN7X2K9Q",
+    "payment_url": "https://dev.zicharge.com/merchant/payment?token=PMTKN7X2K9Q",
+    "expires_in_minutes": 15
   }
 }
 ```
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `data.payment_token` | string | Opaque token bound to this order. Valid for 15 minutes. |
-| `data.redirect_url` | string | Hosted checkout URL. Redirect the customer here immediately after minting. |
-| `data.order_id` | string | Echoes your submitted `order_id`. |
-| `data.expires_in_seconds` | integer | Seconds until the token expires (900 = 15 minutes). |
+| `data.token` | string | Single-use payment token bound to this order. |
+| `data.payment_url` | string | Hosted checkout URL. Redirect the customer here, or render as a QR code. |
+| `data.expires_in_minutes` | integer | Minutes until the token expires (typically 15). |
 
 ---
 
 ## What to do next
 
-After minting the token, redirect the customer to `redirect_url`:
+After minting the token:
 
-```
-https://secure.zicharge.com/merchant/payment?token=<payment_token>
-```
+- **Web checkout** — redirect the customer to `payment_url`
+- **QR / in-store** — render `payment_url` as a QR code
 
-The customer sees a one-page checkout: they enter their ZiCharge mobile number and PIN. Once paid, ZiCharge dispatches an [IPN callback](ipn-callback.md) to your listener.
+Once the customer pays, ZiCharge posts an [IPN callback](ipn-callback.md) to your `ipn_url`. Call [Validate Payment](validate-payment.md) to independently confirm the result.
 
 !!! warning "Token expiry"
-    The token is valid for **15 minutes**. If the customer opens an expired token, the gateway cancels it and fires a `Cancelled` IPN.
+    The token is valid for `expires_in_minutes` minutes. If a customer opens an expired token, the gateway cancels it and fires a `Cancelled` IPN.
 
 ---
 
-## Error codes
+## Error responses
 
-| `code` | Meaning | Action |
+| `code` | Message | Action |
 |--------|---------|--------|
-| `200` | Token minted | Redirect customer to `redirect_url` |
-| `401` | Invalid credentials | Check `merchant_mobile_no` and `store_password` |
-| `409` | `order_id` already exists | Use a new unique `order_id` |
-| `422` | Validation failure | Check `bill_amount` (min 250 IQD) and required fields |
+| `200` | — | Token minted. Redirect customer to `payment_url`. |
+| `422` | `Invalid store credentials.` | Check `merchant_mobile_no` and `store_password`. |
+| `422` | `Account is inactive.` | Contact integrations@zicharge.com. |
+| `422` | `merchant_mobile_no must not be blank` | Add the missing required field. |
 
 [Full error code reference →](../06-error-codes.md)

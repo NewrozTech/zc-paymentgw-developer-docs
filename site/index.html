@@ -31,6 +31,7 @@
       
     
     
+
       <link rel="stylesheet" href="assets/stylesheets/main.484c7ddc.min.css">
       
         
@@ -40,6 +41,90 @@
 
 
     
+<style>
+  /* ── Suppress the default "Home" H1 page title ───────── */
+  .md-typeset h1:first-child {
+    display: none;
+  }
+
+  /* ── Home page H2 → styled as prominent section labels ── */
+  .md-typeset h2 {
+    font-size: 0.72rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.12em !important;
+    text-transform: uppercase !important;
+    color: var(--zi-blue-600) !important;
+    border-bottom: none !important;
+    padding: 0 !important;
+    margin: 2.75rem 0 1.25rem !important;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .md-typeset h2::before {
+    content: "";
+    display: inline-block;
+    width: 3px;
+    height: 1em;
+    background: var(--zi-teal-500);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  [data-md-color-scheme="slate"] .md-typeset h2 {
+    color: var(--zi-teal-400) !important;
+  }
+
+  /* ── Section intro line ──────────────────────────────── */
+  .zi-section-intro {
+    font-size: 0.93rem;
+    color: var(--zi-grey-600);
+    line-height: 1.65;
+    margin: -0.5rem 0 1.5rem !important;
+    max-width: 680px;
+  }
+
+  [data-md-color-scheme="slate"] .zi-section-intro {
+    color: rgba(255,255,255,0.55);
+  }
+
+  /* ── Hero wave separator ─────────────────────────────── */
+  .zi-hero::after {
+    content: "";
+    display: block;
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 48px;
+    background: var(--md-default-bg-color, #fff);
+    clip-path: ellipse(56% 100% at 50% 100%);
+  }
+
+  /* ── Normalize CTA buttons ───────────────────────────── */
+  .zi-btn--ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.65rem 1.6rem;
+    font-size: 0.92rem;
+    font-weight: 600;
+  }
+
+  .zi-btn--ghost svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    opacity: 0.85;
+  }
+
+  /* ── Full-width form row ─────────────────────────────── */
+  .zi-form-row--full {
+    grid-template-columns: 1fr !important;
+  }
+</style>
+
     
       
     
@@ -80,7 +165,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#interactive-api-explorer" class="md-skip">
+        <a href="#integration-flows" class="md-skip">
           Skip to content
         </a>
       
@@ -209,16 +294,19 @@
 <div class="zi-hero">
   <div class="zi-hero__grid-bg"></div>
   <div class="zi-hero__inner">
-    <div class="zi-hero__badge">Merchant Payment Gateway &nbsp;·&nbsp; Developer Documentation</div>
+    <div class="zi-hero__badge">Developer Documentation</div>
     <h1 class="zi-hero__title">Accept Payments with<br><span class="zi-hero__title-accent">ZiCharge</span></h1>
     <p class="zi-hero__subtitle">
       Integrate the ZiCharge wallet payment gateway into your platform in hours.
-      Hosted checkout, direct charge, QR flow, and cashback — all on a single API.
+      Hosted checkout, QR flow, and cashback disbursement — all on a single API.
     </p>
     <div class="zi-hero__actions">
       <a href="deposit/initiate-payment/" class="zi-btn zi-btn--primary zi-btn--lg">Get started</a>
       <a href="api-explorer/" class="zi-btn zi-btn--ghost zi-btn--lg">
-        <span class="zi-btn-icon">▶</span> Try the API
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 4l5 4-5 4V4z" fill="currentColor"/>
+        </svg>
+        Try the API
       </a>
     </div>
     <div class="zi-hero__stats">
@@ -228,7 +316,7 @@
       </div>
       <div class="zi-stat__divider"></div>
       <div class="zi-stat">
-        <span class="zi-stat__num">3</span>
+        <span class="zi-stat__num">6</span>
         <span class="zi-stat__label">API endpoints</span>
       </div>
       <div class="zi-stat__divider"></div>
@@ -323,7 +411,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="withdrawal/cashback/" class="md-tabs__link">
+        <a href="withdrawal/generate-api-key/" class="md-tabs__link">
           
   
   
@@ -511,6 +599,40 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#integration-flows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Integration Flows
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API Reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api-explorer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API Explorer
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="API Explorer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#interactive-api-explorer" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -520,8 +642,25 @@
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
+  <a href="#environments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environments
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Environments">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#sandbox" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -531,12 +670,28 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#production" class="md-nav__link">
     <span class="md-ellipsis">
       
         Production
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#become-a-merchant_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Become a Merchant
       
     </span>
   </a>
@@ -742,6 +897,8 @@
       
         
       
+        
+      
     
     
     
@@ -786,6 +943,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="withdrawal/generate-api-key/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generate API Key
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -985,6 +1170,40 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#integration-flows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Integration Flows
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API Reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api-explorer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API Explorer
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="API Explorer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#interactive-api-explorer" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -994,8 +1213,25 @@
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
+  <a href="#environments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environments
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Environments">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#sandbox" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1005,12 +1241,28 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#production" class="md-nav__link">
     <span class="md-ellipsis">
       
         Production
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#become-a-merchant_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Become a Merchant
       
     </span>
   </a>
@@ -1037,56 +1289,52 @@
 
   <h1>Home</h1>
 
-<div class="zi-section-label">Integration Flows</div>
+<h2 id="integration-flows">Integration Flows<a class="headerlink" href="#integration-flows" title="Permanent link">&para;</a></h2>
+<p class="zi-section-intro">Your backend mints a token or pushes a credit — ZiCharge handles the hosted checkout, wallet debit, and real-time confirmation.</p>
 
-<div class="zi-diagram-tabs-wrap">
-
-=== "Online Payment (Deposit)"
-
-    <p class="zi-diagram-desc">Your backend mints a token → customer pays on hosted checkout → you receive an IPN → validate server-side to confirm.</p>
-
-    <pre class="mermaid"><code>sequenceDiagram
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Online Payment (Deposit)</label><label for="__tabbed_1_2">Cashback (Withdrawal)</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p><p class="zi-diagram-desc">Your backend mints a token → customer pays on hosted checkout → you receive an IPN → validate server-side to confirm.</p></p>
+<pre class="mermaid"><code>sequenceDiagram
     autonumber
     participant M as Your Server
     participant G as ZiCharge Gateway
     participant C as Customer
 
     M-&gt;&gt;G: POST /merchant/generate-payment-token
-    G--&gt;&gt;M: payment_token + redirect_url
+    G--&gt;&gt;M: token + payment_url
     M-&gt;&gt;C: Redirect customer to hosted checkout
 
     C-&gt;&gt;G: Enter mobile number and PIN
     G--&gt;&gt;C: Payment confirmed
 
-    G-&gt;&gt;M: POST ipn_url - IPN notification
+    G-&gt;&gt;M: POST ipn_url — IPN notification
     M--&gt;&gt;G: HTTP 200 acknowledge
 
     M-&gt;&gt;G: POST /merchant/payment/validation
-    G--&gt;&gt;M: transaction_id confirmed</code></pre>
-
-=== "Cashback (Withdrawal)"
-
-    <p class="zi-diagram-desc">Your backend pushes a credit directly to the customer wallet in a single synchronous call — no redirect or IPN required.</p>
-
-    <pre class="mermaid"><code>sequenceDiagram
+    G--&gt;&gt;M: tx_unique_id + status confirmed</code></pre>
+</div>
+<div class="tabbed-block">
+<p><p class="zi-diagram-desc">Your backend pushes a credit directly to the customer wallet in a single synchronous call — no redirect or IPN required.</p></p>
+<pre class="mermaid"><code>sequenceDiagram
     autonumber
     participant M as Your Server
     participant G as ZiCharge Gateway
     participant W as Customer Wallet
 
-    M-&gt;&gt;G: POST /merchant/payment/cashback
+    M-&gt;&gt;G: POST /api/v3/merchant/cash-back
     G-&gt;&gt;W: Credit amount applied to wallet
-    G--&gt;&gt;M: transaction_id + Success
+    G--&gt;&gt;M: tx_unique_id + Success
 
-    note over M,G: Optional - fetch full transaction record
+    note over M,G: Optional — verify the transaction record
     M-&gt;&gt;G: POST /merchant/payment/validation
-    G--&gt;&gt;M: transaction_id, amount, received_at</code></pre>
-
+    G--&gt;&gt;M: tx_unique_id, amount, received_at</code></pre>
 </div>
-
+</div>
+</div>
 <hr />
-<div class="zi-section-label">API Reference</div>
-
+<h2 id="api-reference">API Reference<a class="headerlink" href="#api-reference" title="Permanent link">&para;</a></h2>
 <div class="zi-api-section">
 <div class="zi-api-group">
 <div class="zi-api-group-header">
@@ -1132,6 +1380,13 @@ Confirm the final payment status and obtain the canonical transaction ID.</p>
 <div class="zi-api-item">
 <p><span class="zi-method zi-method--post">POST</span></p>
 <div class="zi-api-item-body">
+<p><strong><a href="withdrawal/generate-api-key/">Generate API Key</a></strong>
+Issue a merchant API key for Bearer token authentication on Cashback requests.</p>
+</div>
+</div>
+<div class="zi-api-item">
+<p><span class="zi-method zi-method--post">POST</span></p>
+<div class="zi-api-item-body">
 <p><strong><a href="withdrawal/cashback/">Cashback</a></strong>
 Credit a customer wallet synchronously — for refunds, rewards, and promotions.</p>
 </div>
@@ -1147,8 +1402,7 @@ Fetch the full transaction record for a completed cashback.</p>
 </div>
 </div>
 <hr />
-<div class="zi-section-label">Try the API</div>
-
+<h2 id="api-explorer">API Explorer<a class="headerlink" href="#api-explorer" title="Permanent link">&para;</a></h2>
 <div class="zi-explorer-cta">
 <div class="zi-explorer-cta-text">
 <h3 id="interactive-api-explorer">Interactive API Explorer<a class="headerlink" href="#interactive-api-explorer" title="Permanent link">&para;</a></h3>
@@ -1158,7 +1412,7 @@ Fetch the full transaction record for a completed cashback.</p>
 <a href="assets/postman/ZiCharge-Merchant-API.postman_collection.json" download class="zi-btn zi-btn--outline zi-btn--lg">Download Postman Collection</a></p>
 </div>
 <div class="zi-explorer-meta">
-<p>Covers 3 live endpoints · Sandbox &amp; Production servers · Inline request builder · Example responses</p>
+<p>Covers 4 live endpoints · Sandbox &amp; Production servers · Inline request builder · Example responses</p>
 </div>
 </div>
 <div class="zi-explorer-cta-preview">
@@ -1172,14 +1426,14 @@ Fetch the full transaction record for a completed cashback.</p>
 <div class="zi-mock-explorer-body">
 <div class="zi-mock-row"><span class="zi-mock-tag zi-mock-tag--post">POST</span><span class="zi-mock-path">/merchant/generate-payment-token</span></div>
 <div class="zi-mock-row"><span class="zi-mock-tag zi-mock-tag--post">POST</span><span class="zi-mock-path">/merchant/payment/validation</span></div>
-<div class="zi-mock-row"><span class="zi-mock-tag zi-mock-tag--post">POST</span><span class="zi-mock-path">/merchant/payment/cashback</span></div>
+<div class="zi-mock-row"><span class="zi-mock-tag zi-mock-tag--post">POST</span><span class="zi-mock-path">/api/v3/merchant/generate-api-key</span></div>
+<div class="zi-mock-row"><span class="zi-mock-tag zi-mock-tag--post">POST</span><span class="zi-mock-path">/api/v3/merchant/cash-back</span></div>
 </div>
 </div>
 </div>
 </div>
 <hr />
-<div class="zi-section-label">Environments</div>
-
+<h2 id="environments">Environments<a class="headerlink" href="#environments" title="Permanent link">&para;</a></h2>
 <div class="zi-env-grid">
 <div class="zi-env-card zi-env-card--sandbox">
 <h3 id="sandbox">Sandbox<a class="headerlink" href="#sandbox" title="Permanent link">&para;</a></h3>
@@ -1204,13 +1458,10 @@ Fetch the full transaction record for a completed cashback.</p>
 </div>
 <hr />
 <div class="zi-merchant-section" id="become-a-merchant">
-
-## Become a Merchant
-
-Interested in integrating ZiCharge payments into your platform? Fill in your details and our integrations team will be in touch.
-
-<form id="merchant-form" class="zi-merchant-form" novalidate>
-  <div class="zi-form-row">
+<h2 id="become-a-merchant_1">Become a Merchant<a class="headerlink" href="#become-a-merchant_1" title="Permanent link">&para;</a></h2>
+<p>Interested in integrating ZiCharge payments into your platform? Fill in your details and our integrations team will be in touch.</p>
+<form class="zi-merchant-form" id="merchant-form" novalidate="novalidate">
+<div class="zi-form-row">
     <div class="zi-form-group">
       <label class="zi-form-label" for="business-name">Business Name <span class="zi-required">*</span></label>
       <input class="zi-form-input" type="text" id="business-name" placeholder="e.g. Al-Rashid Electronics" required>
@@ -1218,9 +1469,11 @@ Interested in integrating ZiCharge payments into your platform? Fill in your det
     <div class="zi-form-group">
       <label class="zi-form-label" for="website-url">Website URL <span class="zi-required">*</span></label>
       <input class="zi-form-input" type="url" id="website-url" placeholder="https://yoursite.com" required>
-    </div>
-  </div>
-  <div class="zi-form-row">
+    </form>
+</div>
+<p></div>
+<br />
+<div class="zi-form-row">
     <div class="zi-form-group">
       <label class="zi-form-label" for="currencies">Available Currencies <span class="zi-required">*</span></label>
       <input class="zi-form-input" type="text" id="currencies" placeholder="e.g. IQD, USD" required>
@@ -1229,21 +1482,19 @@ Interested in integrating ZiCharge payments into your platform? Fill in your det
       <label class="zi-form-label" for="contact-name">Contact Person Name <span class="zi-required">*</span></label>
       <input class="zi-form-input" type="text" id="contact-name" placeholder="Full name" required>
     </div>
-  </div>
-  <div class="zi-form-row">
+  </div></p>
+<div class="zi-form-row zi-form-row--full">
     <div class="zi-form-group">
       <label class="zi-form-label" for="contact-email">Contact Email <span class="zi-required">*</span></label>
       <input class="zi-form-input" type="email" id="contact-email" placeholder="you@yoursite.com" required>
     </div>
   </div>
-  <div class="zi-form-actions">
+<div class="zi-form-actions">
     <button type="submit" class="zi-btn zi-btn--primary zi-btn--lg">Submit Enquiry</button>
     <p class="zi-form-note">Our integrations team typically responds within 1–2 business days.</p>
   </div>
 </form>
-
 </div>
-
 <script>
 document.getElementById('merchant-form').addEventListener('submit', function(e) {
   e.preventDefault();
@@ -1291,51 +1542,46 @@ document.getElementById('merchant-form').addEventListener('submit', function(e) 
       </main>
       
         <footer class="md-footer">
-  
-    
-      
-      <nav class="md-footer__inner md-grid" aria-label="Footer" >
-        
-        
-          
-          <a href="api-explorer/" class="md-footer__link md-footer__link--next" aria-label="Next: API Explorer">
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              <div class="md-ellipsis">
-                API Explorer
-              </div>
-            </div>
-            <div class="md-footer__button md-icon">
-              
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
-            </div>
-          </a>
-        
-      </nav>
-    
-  
   <div class="md-footer-meta md-typeset">
-    <div class="md-footer-meta__inner md-grid">
-      <div class="md-copyright">
-  
-  
-</div>
-      
-        
-<div class="md-social">
-  
-    
-    
-    
-    
-    <a href="mailto:integrations@zicharge.com" target="_blank" rel="noopener" title="Integration Support" class="md-social__link">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4l208 156a48 48 0 0 0 57.6 0l208-156c12.1-9.1 19.2-23.3 19.2-38.4 0-26.5-21.5-48-48-48zM0 196v188c0 35.3 28.7 64 64 64h384c35.3 0 64-28.7 64-64V196L313.6 344.8c-34.1 25.6-81.1 25.6-115.2 0z"/></svg>
-    </a>
-  
-</div>
-      
+    <div class="zi-footer-inner">
+
+      <!-- Brand -->
+      <div class="zi-footer-brand">
+        <span class="zi-footer-logo">ZiCharge</span>
+        <span class="zi-footer-badge">Merchant API</span>
+        <p class="zi-footer-tagline">Secure wallet payments for Iraq.</p>
+      </div>
+
+      <!-- Links -->
+      <div class="zi-footer-links">
+        <div class="zi-footer-col">
+          <div class="zi-footer-col-title">API Reference</div>
+          <a href="https://newroztech.github.io/zc-paymentgw-developer-docs/deposit/initiate-payment/">Initiate Payment</a>
+          <a href="https://newroztech.github.io/zc-paymentgw-developer-docs/deposit/ipn-callback/">IPN Callback</a>
+          <a href="https://newroztech.github.io/zc-paymentgw-developer-docs/withdrawal/cashback/">Cashback</a>
+          <a href="https://newroztech.github.io/zc-paymentgw-developer-docs/withdrawal/generate-api-key/">Generate API Key</a>
+        </div>
+        <div class="zi-footer-col">
+          <div class="zi-footer-col-title">Resources</div>
+          <a href="https://newroztech.github.io/zc-paymentgw-developer-docs/api-explorer/">API Explorer</a>
+          <a href="https://newroztech.github.io/zc-paymentgw-developer-docs/06-error-codes/">Error Codes</a>
+          <a href="https://newroztech.github.io/zc-paymentgw-developer-docs/02-authentication/">Auth & Security</a>
+          <a href="https://newroztech.github.io/zc-paymentgw-developer-docs/07-testing-and-go-live/">Testing & Go-Live</a>
+        </div>
+        <div class="zi-footer-col">
+          <div class="zi-footer-col-title">Support</div>
+          <a href="mailto:integrations@zicharge.com">integrations@zicharge.com</a>
+          <a href="https://newroztech.github.io/zc-paymentgw-developer-docs/#become-a-merchant">Become a Merchant</a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom bar -->
+    <div class="zi-footer-bottom">
+      <span>&copy; 2026 ZiCharge. All rights reserved.</span>
+      <span class="zi-footer-sep">·</span>
+      <span>Built for developers integrating the ZiCharge Merchant Payment Gateway.</span>
     </div>
   </div>
 </footer>

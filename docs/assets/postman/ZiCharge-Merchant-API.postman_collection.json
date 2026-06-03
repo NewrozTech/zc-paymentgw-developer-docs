@@ -1,46 +1,15 @@
 {
   "info": {
+    "_postman_id": "f315f5be-8e60-428f-ae88-04d75011b292",
     "name": "ZiCharge Merchant API",
-    "description": "Complete Postman collection for the ZiCharge Merchant Payment Gateway. Covers Deposit (Initiate Payment, Validate Payment) and Withdrawal (Cashback, Validate Payment) flows.\n\nSet the collection variables before running:\n- `base_url` — use `https://dev.zicharge.com` for sandbox or `https://secure.zicharge.com` for production\n- `merchant_mobile_no` — your provisioned merchant wallet number\n- `store_password` — your provisioned store password\n- `ipn_url` — your publicly accessible IPN listener endpoint",
+    "description": "Postman collection for the ZiCharge Merchant Payment Gateway.\n\n**Flows**\n- **Deposit** — Collect payment from a customer wallet: Initiate Payment → customer pays → IPN callback → Validate Payment\n- **Withdrawal** — Push cashback/refund from merchant wallet to customer: Cashback → Validate Payment\n- **Security** — Generate API key + webhook secret for signed IPNs and keyless cashback auth\n\n**Response envelope** (all endpoints)\n```\n{ \"code\": <int>, \"messages\": [\"...\"], \"data\": { ... } | null }\n```\n`code` mirrors the logical status (200 success · 422 business/validation error · 404 not found). The HTTP status is always **200 OK**.\n\n**IPN Security** — ZiCharge signs every outbound IPN with `X-ZiCharge-Signature: t=<epoch>,v1=<hmac>`. Verify the HMAC using your `webhook_secret` and reject requests where `|now - t| > 300s`.\n\n**Setup — set these collection variables before use**\n| Variable | Example | Notes |\n|---|---|---|\n| `base_url` | `https://dev.zicharge.com` | Use `https://secure.zicharge.com` for production |\n| `merchant_mobile_no` | `+9647712345678` | Provisioned merchant wallet number (E.164) |\n| `store_password` | `your-store-password` | Provisioned store password — never expose client-side |\n| `api_key` | *(from generate-api-key)* | API key for cashback auth — use `Authorization: Bearer {{api_key}}` |\n| `ipn_url` | `https://yoursite.com/webhooks/zicharge/ipn` | Publicly reachable HTTPS IPN listener |\n| `order_id` | `ORD-2026-000001` | Your unique order / reference ID |\n| `customer_mobile_no` | `+9647701234567` | Customer ZiCharge wallet number (E.164) |",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "zicharge-merchant-api-v1"
+    "_exporter_id": "2048354"
   },
-  "variable": [
-    {
-      "key": "base_url",
-      "value": "https://dev.zicharge.com",
-      "description": "Base URL. Use https://dev.zicharge.com for sandbox, https://secure.zicharge.com for production."
-    },
-    {
-      "key": "merchant_mobile_no",
-      "value": "+9647712345678",
-      "description": "Your provisioned merchant wallet number (E.164 format)."
-    },
-    {
-      "key": "store_password",
-      "value": "your-store-password",
-      "description": "Your provisioned store password. Never expose this client-side."
-    },
-    {
-      "key": "ipn_url",
-      "value": "https://yoursite.com/webhooks/zicharge/ipn",
-      "description": "Your publicly accessible IPN listener endpoint (HTTPS only)."
-    },
-    {
-      "key": "order_id",
-      "value": "ORD-2026-000001",
-      "description": "Your unique order ID. Reusing the same order_id will not double-charge."
-    },
-    {
-      "key": "customer_mobile_no",
-      "value": "+9647701234567",
-      "description": "The customer's ZiCharge wallet number (E.164 format)."
-    }
-  ],
   "item": [
     {
       "name": "Deposit",
-      "description": "Collect payments from customer ZiCharge wallets. Use Initiate Payment to mint a token, redirect the customer to checkout, receive an IPN callback, then Validate Payment to confirm.",
+      "description": "Collect payments from customer ZiCharge wallets.\n\n**Flow:** Initiate Payment (get token) → redirect customer to `payment_url` or display QR → receive IPN callback → Validate Payment to independently confirm.",
       "item": [
         {
           "name": "Initiate Payment",
@@ -58,7 +27,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"merchant_mobile_no\": \"{{merchant_mobile_no}}\",\n  \"store_password\": \"{{store_password}}\",\n  \"order_id\": \"{{order_id}}\",\n  \"bill_amount\": 5000,\n  \"success_url\": \"https://yoursite.com/orders/success\",\n  \"cancel_url\": \"https://yoursite.com/orders/cancel\",\n  \"ipn_url\": \"{{ipn_url}}\"\n}",
+              "raw": "{\n  \"merchant_mobile_no\": \"{{merchant_mobile_no}}\",\n  \"store_password\": \"{{store_password}}\",\n  \"order_id\": \"{{order_id}}\",\n  \"bill_amount\": 1000,\n  \"success_url\": \"https://yoursite.com/payment/success\",\n  \"cancel_url\": \"https://yoursite.com/payment/cancel\",\n  \"fail_url\": \"https://yoursite.com/payment/fail\",\n  \"customer_mobile_no\": \"{{customer_mobile_no}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -70,44 +39,112 @@
               "host": ["{{base_url}}"],
               "path": ["merchant", "generate-payment-token"]
             },
-            "description": "Mints a payment token for a given order. Returns a `payment_token` and a `redirect_url` to send the customer to the hosted checkout page.\n\n**After this call:**\nRedirect the customer to `redirect_url`. The token is valid for 15 minutes."
+            "description": "Mint a single-use payment token and checkout URL.\n\nRedirect the customer to `payment_url` (web) or display it as a QR code (mobile). The token expires in `expires_in_minutes` minutes.\n\nAlso available at the alias `/merchant/generate-qr-token`."
           },
           "response": [
             {
-              "name": "Success — token minted",
+              "name": "200 Success — token minted",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {"key": "Content-Type", "value": "application/json"},
+                  {"key": "Accept", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"merchant_mobile_no\": \"+9647712345678\",\n  \"store_password\": \"test@store123\",\n  \"order_id\": \"ORD-2026-000001\",\n  \"bill_amount\": 1000,\n  \"success_url\": \"https://yoursite.com/payment/success\",\n  \"cancel_url\": \"https://yoursite.com/payment/cancel\",\n  \"fail_url\": \"https://yoursite.com/payment/fail\",\n  \"customer_mobile_no\": \"+9647701234567\"\n}",
+                  "options": {"raw": {"language": "json"}}
+                },
+                "url": {
+                  "raw": "{{base_url}}/merchant/generate-payment-token",
+                  "host": ["{{base_url}}"],
+                  "path": ["merchant", "generate-payment-token"]
+                }
+              },
               "status": "OK",
               "code": 200,
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                }
-              ],
-              "body": "{\n  \"code\": 200,\n  \"messages\": [\"Token generated successfully.\"],\n  \"data\": {\n    \"payment_token\": \"tok_a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4\",\n    \"redirect_url\": \"https://secure.zicharge.com/merchant/payment?token=tok_a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4\",\n    \"order_id\": \"ORD-2026-000001\",\n    \"expires_in_seconds\": 900\n  }\n}"
+              "_postman_previewlanguage": "json",
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "cookie": [],
+              "body": "{\n  \"messages\": [],\n  \"data\": {\n    \"token\": \"PMTKN7X2K9Q\",\n    \"payment_url\": \"https://dev.zicharge.com/merchant/payment?token=PMTKN7X2K9Q\",\n    \"expires_in_minutes\": 15\n  },\n  \"code\": 200\n}"
             },
             {
-              "name": "Error — duplicate order_id",
+              "name": "422 Invalid store credentials",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {"key": "Content-Type", "value": "application/json"},
+                  {"key": "Accept", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"merchant_mobile_no\": \"+9647712345678\",\n  \"store_password\": \"wrong-password\",\n  \"order_id\": \"ORD-2026-000001\",\n  \"bill_amount\": 1000\n}",
+                  "options": {"raw": {"language": "json"}}
+                },
+                "url": {
+                  "raw": "{{base_url}}/merchant/generate-payment-token",
+                  "host": ["{{base_url}}"],
+                  "path": ["merchant", "generate-payment-token"]
+                }
+              },
               "status": "OK",
               "code": 200,
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                }
-              ],
-              "body": "{\n  \"code\": 409,\n  \"messages\": [\"Order ID already exists.\"],\n  \"data\": null\n}"
+              "_postman_previewlanguage": "json",
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "cookie": [],
+              "body": "{\n  \"messages\": [\"Invalid store credentials.\"],\n  \"data\": null,\n  \"code\": 422\n}"
             },
             {
-              "name": "Error — invalid credentials",
+              "name": "422 Merchant account inactive",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {"key": "Content-Type", "value": "application/json"},
+                  {"key": "Accept", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"merchant_mobile_no\": \"+9647712345678\",\n  \"store_password\": \"test@store123\",\n  \"order_id\": \"ORD-2026-000001\",\n  \"bill_amount\": 1000\n}",
+                  "options": {"raw": {"language": "json"}}
+                },
+                "url": {
+                  "raw": "{{base_url}}/merchant/generate-payment-token",
+                  "host": ["{{base_url}}"],
+                  "path": ["merchant", "generate-payment-token"]
+                }
+              },
               "status": "OK",
               "code": 200,
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
+              "_postman_previewlanguage": "json",
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "cookie": [],
+              "body": "{\n  \"messages\": [\"Account is inactive.\"],\n  \"data\": null,\n  \"code\": 422\n}"
+            },
+            {
+              "name": "422 Validation error — missing required field",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {"key": "Content-Type", "value": "application/json"},
+                  {"key": "Accept", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"store_password\": \"test@store123\",\n  \"order_id\": \"ORD-2026-000001\"\n}",
+                  "options": {"raw": {"language": "json"}}
+                },
+                "url": {
+                  "raw": "{{base_url}}/merchant/generate-payment-token",
+                  "host": ["{{base_url}}"],
+                  "path": ["merchant", "generate-payment-token"]
                 }
-              ],
-              "body": "{\n  \"code\": 401,\n  \"messages\": [\"Authentication failed.\"],\n  \"data\": null\n}"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "cookie": [],
+              "body": "{\n  \"messages\": [\"merchant_mobile_no must not be blank\", \"bill_amount must not be null\"],\n  \"data\": null,\n  \"code\": 422\n}"
             }
           ]
         },
@@ -122,44 +159,115 @@
               },
               {
                 "key": "X-ZiCharge-Signature",
-                "value": "<hmac-sha256-hex>",
-                "description": "HMAC-SHA256 of the raw request body using your IPN secret."
-              },
-              {
-                "key": "X-ZiCharge-Timestamp",
-                "value": "1716192000",
-                "description": "Unix epoch seconds at dispatch time."
-              },
-              {
-                "key": "X-ZiCharge-Request-Id",
-                "value": "req_abc123xyz",
-                "description": "Opaque ID for deduplication and support correlation."
+                "value": "t=1716285600,v1=a3f8e2c1...<hex-hmac>",
+                "description": "Stripe-style HMAC-SHA256 signature. Present only when merchant has a webhook_secret provisioned. Verify: signed_payload = t + '.' + body; expected = HMAC-SHA256(webhook_secret, signed_payload). Reject if |now - t| > 300s."
               }
             ],
             "body": {
               "mode": "urlencoded",
               "urlencoded": [
-                { "key": "transaction_id", "value": "123456" },
-                { "key": "order_id", "value": "ORD-2026-000001" },
-                { "key": "bill_amount", "value": "5000" },
-                { "key": "customer_account_no", "value": "+9647701234567" },
-                { "key": "status", "value": "Success" },
-                { "key": "received_at", "value": "2026-05-20 10:00:00" },
-                { "key": "ipn", "value": "1" }
+                {
+                  "key": "transaction_id",
+                  "value": "5367827",
+                  "description": "Numeric internal transaction ID (legacy field)."
+                },
+                {
+                  "key": "tx_unique_id",
+                  "value": "CVIBAON916",
+                  "description": "Public transaction reference (preferred for reconciliation)."
+                },
+                {
+                  "key": "order_id",
+                  "value": "ORD-2026-000001",
+                  "description": "Your order ID as submitted to Initiate Payment."
+                },
+                {
+                  "key": "bill_amount",
+                  "value": "1000.00",
+                  "description": "Amount in IQD as decimal string."
+                },
+                {
+                  "key": "customer_account_no",
+                  "value": "+9647701234567",
+                  "description": "Customer's ZiCharge wallet number."
+                },
+                {
+                  "key": "status",
+                  "value": "Success",
+                  "description": "Transaction status: Success or Cancelled."
+                },
+                {
+                  "key": "received_at",
+                  "value": "2026-05-20 10:00:00",
+                  "description": "Transaction timestamp (yyyy-MM-dd HH:mm:ss)."
+                },
+                {
+                  "key": "ipn",
+                  "value": "1",
+                  "description": "Always 1 — IPN push indicator."
+                }
               ]
             },
             "url": {
               "raw": "{{ipn_url}}",
               "host": ["{{ipn_url}}"]
             },
-            "description": "This request is sent BY ZiCharge TO your IPN listener — not a call you make outbound.\n\nThis entry is provided as a reference so you can use Postman to simulate an IPN delivery against your local listener during development.\n\n**Your listener must:**\n1. Verify the HMAC-SHA256 signature against the raw body\n2. Check timestamp drift (reject if > 5 minutes old)\n3. Deduplicate on X-ZiCharge-Request-Id\n4. Persist the IPN record\n5. Return HTTP 200 ONLY after persistence"
+            "description": "**ZiCharge → Your server.** This POST is dispatched by ZiCharge to your `ipn_url` after a payment completes or is cancelled.\n\nThis request is **reference only** — use it to simulate an IPN delivery against your local listener during development.\n\n**Your listener must:**\n1. Verify `order_id` belongs to your system before trusting the payload\n2. Mark the order as paid **only** when `status == \"Success\"`\n3. Return HTTP 200 OK — any other status is treated as a delivery failure and may be retried\n\n**Fields:** `tx_unique_id` is the public transaction reference (preferred). `transaction_id` is a legacy numeric internal ID. Correlate primarily on `order_id` + `tx_unique_id`."
           },
           "response": [
             {
-              "name": "Acknowledged",
+              "name": "IPN Success — payment completed",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/x-www-form-urlencoded"}],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {"key": "transaction_id", "value": "5367827"},
+                    {"key": "tx_unique_id", "value": "CVIBAON916"},
+                    {"key": "order_id", "value": "ORD-2026-000001"},
+                    {"key": "bill_amount", "value": "1000.00"},
+                    {"key": "customer_account_no", "value": "+9647701234567"},
+                    {"key": "status", "value": "Success"},
+                    {"key": "received_at", "value": "2026-05-20 10:00:00"},
+                    {"key": "ipn", "value": "1"}
+                  ]
+                },
+                "url": {"raw": "{{ipn_url}}", "host": ["{{ipn_url}}"]}
+              },
               "status": "OK",
               "code": 200,
-              "body": ""
+              "_postman_previewlanguage": "text",
+              "header": [{"key": "Content-Type", "value": "text/plain"}],
+              "cookie": [],
+              "body": "OK"
+            },
+            {
+              "name": "IPN Cancel — payment cancelled",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/x-www-form-urlencoded"}],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {"key": "transaction_id", "value": ""},
+                    {"key": "tx_unique_id", "value": ""},
+                    {"key": "order_id", "value": "ORD-2026-000001"},
+                    {"key": "bill_amount", "value": "1000.00"},
+                    {"key": "customer_account_no", "value": "+9647701234567"},
+                    {"key": "status", "value": "Cancelled"},
+                    {"key": "received_at", "value": "2026-05-20 10:05:00"},
+                    {"key": "ipn", "value": "1"}
+                  ]
+                },
+                "url": {"raw": "{{ipn_url}}", "host": ["{{ipn_url}}"]}
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [{"key": "Content-Type", "value": "text/plain"}],
+              "cookie": [],
+              "body": "OK"
             }
           ]
         },
@@ -191,32 +299,112 @@
               "host": ["{{base_url}}"],
               "path": ["merchant", "payment", "validation"]
             },
-            "description": "Confirms the final status of a payment after receiving an IPN callback. Returns the canonical `transaction_id` to record in your books.\n\nThis endpoint is read-only and safe to call multiple times."
+            "description": "Confirm a deposit transaction by `order_id`. Call this after receiving a successful IPN callback to independently verify the payment server-side.\n\nThis endpoint is read-only and safe to call multiple times.\n\nAlso available as `application/x-www-form-urlencoded` and at the alias `/merchant/validate-payment`."
           },
           "response": [
             {
-              "name": "Success — payment confirmed",
+              "name": "200 Success — payment confirmed",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {"key": "Content-Type", "value": "application/json"},
+                  {"key": "Accept", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"merchant_mobile_no\": \"+9647712345678\",\n  \"store_password\": \"test@store123\",\n  \"order_id\": \"ORD-2026-000001\"\n}",
+                  "options": {"raw": {"language": "json"}}
+                },
+                "url": {
+                  "raw": "{{base_url}}/merchant/payment/validation",
+                  "host": ["{{base_url}}"],
+                  "path": ["merchant", "payment", "validation"]
+                }
+              },
               "status": "OK",
               "code": 200,
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                }
-              ],
-              "body": "{\n  \"code\": 200,\n  \"messages\": [\"Successfully Deposited.\"],\n  \"data\": {\n    \"transaction_id\": 123456,\n    \"order_id\": \"ORD-2026-000001\",\n    \"bill_amount\": \"5000\",\n    \"customer_account_no\": \"+9647701234567\",\n    \"status\": \"Success\",\n    \"received_at\": \"2026-05-20 10:00:00\"\n  }\n}"
+              "_postman_previewlanguage": "json",
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "cookie": [],
+              "body": "{\n  \"messages\": [\"Please find your transaction details.\"],\n  \"data\": {\n    \"tx_unique_id\": \"CVIBAON916\",\n    \"order_id\": \"ORD-2026-000001\",\n    \"bill_amount\": 1000,\n    \"customer_account_no\": \"+9647701234567\",\n    \"status\": \"Success\",\n    \"received_at\": \"2026-05-20 10:00:00\"\n  },\n  \"code\": 200\n}"
             },
             {
-              "name": "Not paid — cancelled or pending",
+              "name": "422 Invalid store credentials",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {"key": "Content-Type", "value": "application/json"},
+                  {"key": "Accept", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"merchant_mobile_no\": \"+9647712345678\",\n  \"store_password\": \"wrong\",\n  \"order_id\": \"ORD-2026-000001\"\n}",
+                  "options": {"raw": {"language": "json"}}
+                },
+                "url": {
+                  "raw": "{{base_url}}/merchant/payment/validation",
+                  "host": ["{{base_url}}"],
+                  "path": ["merchant", "payment", "validation"]
+                }
+              },
               "status": "OK",
               "code": 200,
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
+              "_postman_previewlanguage": "json",
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "cookie": [],
+              "body": "{\n  \"messages\": [\"Invalid store credentials.\"],\n  \"data\": null,\n  \"code\": 422\n}"
+            },
+            {
+              "name": "404 Transaction not found",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {"key": "Content-Type", "value": "application/json"},
+                  {"key": "Accept", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"merchant_mobile_no\": \"+9647712345678\",\n  \"store_password\": \"test@store123\",\n  \"order_id\": \"ORD-DOES-NOT-EXIST\"\n}",
+                  "options": {"raw": {"language": "json"}}
+                },
+                "url": {
+                  "raw": "{{base_url}}/merchant/payment/validation",
+                  "host": ["{{base_url}}"],
+                  "path": ["merchant", "payment", "validation"]
                 }
-              ],
-              "body": "{\n  \"code\": 200,\n  \"messages\": [\"Payment not completed.\"],\n  \"data\": {\n    \"order_id\": \"ORD-2026-000001\",\n    \"status\": \"Cancelled\"\n  }\n}"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "cookie": [],
+              "body": "{\n  \"messages\": [\"Transaction not found.\"],\n  \"data\": null,\n  \"code\": 404\n}"
+            },
+            {
+              "name": "200 Found — transaction cancelled",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {"key": "Content-Type", "value": "application/json"},
+                  {"key": "Accept", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"merchant_mobile_no\": \"+9647712345678\",\n  \"store_password\": \"test@store123\",\n  \"order_id\": \"ORD-2026-000001\"\n}",
+                  "options": {"raw": {"language": "json"}}
+                },
+                "url": {
+                  "raw": "{{base_url}}/merchant/payment/validation",
+                  "host": ["{{base_url}}"],
+                  "path": ["merchant", "payment", "validation"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "cookie": [],
+              "body": "{\n  \"messages\": [\"Please find your transaction details.\"],\n  \"data\": {\n    \"tx_unique_id\": \"CVIBAON916\",\n    \"order_id\": \"ORD-2026-000001\",\n    \"bill_amount\": 1000,\n    \"customer_account_no\": \"+9647701234567\",\n    \"status\": \"Cancelled\",\n    \"received_at\": \"2026-05-20 10:05:00\"\n  },\n  \"code\": 200\n}"
             }
           ]
         }
@@ -224,8 +412,83 @@
     },
     {
       "name": "Withdrawal",
-      "description": "Push credits from your merchant wallet to a customer ZiCharge wallet. Use Cashback to initiate the transfer, then Validate Payment to confirm the transaction record.",
+      "description": "Push credits from your merchant wallet to a customer ZiCharge personal wallet.\n\n**Flow:** Cashback (initiate transfer, settled synchronously) → Validate Payment (confirm the record).\n\n**Recommended auth:** Generate an API key first, then use `Authorization: Bearer {{api_key}}` on the Cashback request.",
       "item": [
+        {
+          "name": "Generate API Key",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Accept", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"merchant_mobile_no\": \"{{merchant_mobile_no}}\",\n  \"store_password\": \"{{store_password}}\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v3/merchant/generate-api-key",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v3", "merchant", "generate-api-key"]
+            },
+            "description": "Generate (or regenerate) a merchant API key.\n\n**Auth:** existing `merchant_mobile_no` + `store_password`.\n\nThe returned `api_key` is shown only once — copy it into the `api_key` collection variable. Use it as `Authorization: Bearer {{api_key}}` on the Cashback request.\n\n**Warning:** Regenerating immediately invalidates the previous key."
+          },
+          "response": [
+            {
+              "name": "200 Success — API key generated",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {"key": "Content-Type", "value": "application/json"},
+                  {"key": "Accept", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"merchant_mobile_no\": \"+9647712345678\",\n  \"store_password\": \"test@store123\"\n}",
+                  "options": {"raw": {"language": "json"}}
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v3/merchant/generate-api-key",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v3", "merchant", "generate-api-key"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "cookie": [],
+              "body": "{\n  \"messages\": [],\n  \"data\": {\n    \"api_key\": \"a3f8e2c1d5b94f7e2a1c8d3e6f9b0c4d7e2a1b5c8d3f6e9a0b4c7d2e5f8a1b4\"\n  },\n  \"code\": 200\n}"
+            },
+            {
+              "name": "422 Invalid store credentials",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {"key": "Content-Type", "value": "application/json"},
+                  {"key": "Accept", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"merchant_mobile_no\": \"+9647712345678\",\n  \"store_password\": \"wrong\"\n}",
+                  "options": {"raw": {"language": "json"}}
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v3/merchant/generate-api-key",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v3", "merchant", "generate-api-key"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "cookie": [],
+              "body": "{\n  \"messages\": [\"Invalid store credentials.\"],\n  \"data\": null,\n  \"code\": 422\n}"
+            }
+          ]
+        },
         {
           "name": "Cashback",
           "request": {
@@ -238,11 +501,16 @@
               {
                 "key": "Accept",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_key}}",
+                "description": "Preferred auth method. When present, merchant_mobile_no and store_password in the body are ignored. Generate a key via POST /api/v3/merchant/generate-api-key."
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"merchant_mobile_no\": \"{{merchant_mobile_no}}\",\n  \"store_password\": \"{{store_password}}\",\n  \"customer_mobile_no\": \"{{customer_mobile_no}}\",\n  \"amount\": 1000,\n  \"order_id\": \"CB-2026-000001\",\n  \"remarks\": \"Refund for order ORD-2026-000001\"\n}",
+              "raw": "{\n  \"receiver_mobile_no\": \"{{customer_mobile_no}}\",\n  \"amount\": 1000,\n  \"reference_id\": \"testcashb90ack@122b\",\n  \"lang\": \"en\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -250,36 +518,168 @@
               }
             },
             "url": {
-              "raw": "{{base_url}}/merchant/payment/cashback",
+              "raw": "{{base_url}}/api/v3/merchant/cash-back",
               "host": ["{{base_url}}"],
-              "path": ["merchant", "payment", "cashback"]
+              "path": ["api", "v3", "merchant", "cash-back"]
             },
-            "description": "Pushes a credit from your merchant wallet to a customer ZiCharge wallet. Settled synchronously — the customer's wallet balance is updated in the same response.\n\nUse for refunds, loyalty credits, and promotional disbursements.\n\nMinimum amount: 250 IQD."
+            "description": "Transfer funds from your merchant wallet to a customer personal wallet as cashback or refund. Settled synchronously — the customer's balance is updated in the same response."
           },
           "response": [
             {
-              "name": "Success — credit applied",
+              "name": "200 Success — cashback sent",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {"key": "Content-Type", "value": "application/json"},
+                  {"key": "Accept", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"merchant_mobile_no\": \"+9647712345678\",\n  \"store_password\": \"test@store123\",\n  \"receiver_mobile_no\": \"+9646666666666\",\n  \"amount\": 1000,\n  \"reference_id\": \"testcashb90ack@122b\",\n  \"lang\": \"en\"\n}",
+                  "options": {"raw": {"language": "json"}}
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v3/merchant/cash-back",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v3", "merchant", "cash-back"]
+                }
+              },
               "status": "OK",
               "code": 200,
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                }
-              ],
-              "body": "{\n  \"code\": 200,\n  \"messages\": [\"Cashback sent successfully.\"],\n  \"data\": {\n    \"transaction_id\": 789012,\n    \"order_id\": \"CB-2026-000001\",\n    \"amount\": \"1000\",\n    \"customer_mobile_no\": \"+9647701234567\",\n    \"status\": \"Success\",\n    \"received_at\": \"2026-05-20 10:05:00\"\n  }\n}"
+              "_postman_previewlanguage": "json",
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "cookie": [],
+              "body": "{\n  \"messages\": [\"The money has been sent.\"],\n  \"data\": {\n    \"tx_unique_id\": \"CVIBAON916\",\n    \"reference_id\": \"testcashb90ack@122b\",\n    \"amount\": 1000,\n    \"customer_account_no\": \"+9646666666666\",\n    \"status\": \"Success\",\n    \"sent_at\": \"2026-05-20 18:39:25\"\n  },\n  \"code\": 200\n}"
             },
             {
-              "name": "Error — insufficient merchant balance",
+              "name": "422 Invalid store credentials",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {"key": "Content-Type", "value": "application/json"},
+                  {"key": "Accept", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"merchant_mobile_no\": \"+9647712345678\",\n  \"store_password\": \"wrong\",\n  \"receiver_mobile_no\": \"+9646666666666\",\n  \"amount\": 1000\n}",
+                  "options": {"raw": {"language": "json"}}
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v3/merchant/cash-back",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v3", "merchant", "cash-back"]
+                }
+              },
               "status": "OK",
               "code": 200,
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
+              "_postman_previewlanguage": "json",
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "cookie": [],
+              "body": "{\n  \"messages\": [\"Invalid store credentials.\"],\n  \"data\": null,\n  \"code\": 422\n}"
+            },
+            {
+              "name": "422 Insufficient merchant balance",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {"key": "Content-Type", "value": "application/json"},
+                  {"key": "Accept", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"merchant_mobile_no\": \"+9647712345678\",\n  \"store_password\": \"test@store123\",\n  \"receiver_mobile_no\": \"+9646666666666\",\n  \"amount\": 9999999\n}",
+                  "options": {"raw": {"language": "json"}}
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v3/merchant/cash-back",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v3", "merchant", "cash-back"]
                 }
-              ],
-              "body": "{\n  \"code\": 422,\n  \"messages\": [\"Insufficient merchant balance.\"],\n  \"data\": null\n}"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "cookie": [],
+              "body": "{\n  \"messages\": [\"Insufficient account balance.\"],\n  \"data\": null,\n  \"code\": 422\n}"
+            },
+            {
+              "name": "422 Invalid customer — not a personal account",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {"key": "Content-Type", "value": "application/json"},
+                  {"key": "Accept", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"merchant_mobile_no\": \"+9647712345678\",\n  \"store_password\": \"test@store123\",\n  \"receiver_mobile_no\": \"+9647799999999\",\n  \"amount\": 1000\n}",
+                  "options": {"raw": {"language": "json"}}
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v3/merchant/cash-back",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v3", "merchant", "cash-back"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "cookie": [],
+              "body": "{\n  \"messages\": [\"Invalid customer account. Only personal accounts can receive cashback.\"],\n  \"data\": null,\n  \"code\": 422\n}"
+            },
+            {
+              "name": "422 Duplicate reference_id",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {"key": "Content-Type", "value": "application/json"},
+                  {"key": "Accept", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"merchant_mobile_no\": \"+9647712345678\",\n  \"store_password\": \"test@store123\",\n  \"receiver_mobile_no\": \"+9646666666666\",\n  \"amount\": 1000,\n  \"reference_id\": \"testcashb90ack@122b\"\n}",
+                  "options": {"raw": {"language": "json"}}
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v3/merchant/cash-back",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v3", "merchant", "cash-back"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "cookie": [],
+              "body": "{\n  \"messages\": [\"Duplicate payment detected for the given reference ID.\"],\n  \"data\": null,\n  \"code\": 422\n}"
+            },
+            {
+              "name": "422 Transaction limit exceeded",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {"key": "Content-Type", "value": "application/json"},
+                  {"key": "Accept", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"merchant_mobile_no\": \"+9647712345678\",\n  \"store_password\": \"test@store123\",\n  \"receiver_mobile_no\": \"+9646666666666\",\n  \"amount\": 5000001\n}",
+                  "options": {"raw": {"language": "json"}}
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v3/merchant/cash-back",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v3", "merchant", "cash-back"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "cookie": [],
+              "body": "{\n  \"messages\": [\"Transaction amount exceeds the allowed limit.\"],\n  \"data\": null,\n  \"code\": 422\n}"
             }
           ]
         },
@@ -299,7 +699,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"merchant_mobile_no\": \"{{merchant_mobile_no}}\",\n  \"store_password\": \"{{store_password}}\",\n  \"order_id\": \"CB-2026-000001\"\n}",
+              "raw": "{\n  \"merchant_mobile_no\": \"{{merchant_mobile_no}}\",\n  \"store_password\": \"{{store_password}}\",\n  \"order_id\": \"testcashb90ack@122b\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -311,24 +711,127 @@
               "host": ["{{base_url}}"],
               "path": ["merchant", "payment", "validation"]
             },
-            "description": "Confirms the status of a cashback transaction by order ID. Returns the canonical `transaction_id`.\n\nThis endpoint is read-only and safe to call multiple times."
+            "description": "Confirm a cashback transaction by its `reference_id` (pass it as `order_id`). Returns the transaction record including `tx_unique_id` and final `status`.\n\nThis endpoint is read-only and safe to call multiple times.\n\nAlso available as `application/x-www-form-urlencoded` and at the alias `/merchant/validate-payment`."
           },
           "response": [
             {
-              "name": "Success — cashback confirmed",
+              "name": "200 Success — cashback confirmed",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {"key": "Content-Type", "value": "application/json"},
+                  {"key": "Accept", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"merchant_mobile_no\": \"+9647712345678\",\n  \"store_password\": \"test@store123\",\n  \"order_id\": \"testcashb90ack@122b\"\n}",
+                  "options": {"raw": {"language": "json"}}
+                },
+                "url": {
+                  "raw": "{{base_url}}/merchant/payment/validation",
+                  "host": ["{{base_url}}"],
+                  "path": ["merchant", "payment", "validation"]
+                }
+              },
               "status": "OK",
               "code": 200,
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
+              "_postman_previewlanguage": "json",
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "cookie": [],
+              "body": "{\n  \"messages\": [\"Please find your transaction details.\"],\n  \"data\": {\n    \"tx_unique_id\": \"CVIBAON916\",\n    \"order_id\": \"testcashb90ack@122b\",\n    \"bill_amount\": 1000,\n    \"customer_account_no\": \"+9646666666666\",\n    \"status\": \"Success\",\n    \"received_at\": \"2026-05-20 18:39:25\"\n  },\n  \"code\": 200\n}"
+            },
+            {
+              "name": "422 Invalid store credentials",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {"key": "Content-Type", "value": "application/json"},
+                  {"key": "Accept", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"merchant_mobile_no\": \"+9647712345678\",\n  \"store_password\": \"wrong\",\n  \"order_id\": \"testcashb90ack@122b\"\n}",
+                  "options": {"raw": {"language": "json"}}
+                },
+                "url": {
+                  "raw": "{{base_url}}/merchant/payment/validation",
+                  "host": ["{{base_url}}"],
+                  "path": ["merchant", "payment", "validation"]
                 }
-              ],
-              "body": "{\n  \"code\": 200,\n  \"messages\": [\"Cashback confirmed.\"],\n  \"data\": {\n    \"transaction_id\": 789012,\n    \"order_id\": \"CB-2026-000001\",\n    \"amount\": \"1000\",\n    \"customer_mobile_no\": \"+9647701234567\",\n    \"status\": \"Success\",\n    \"received_at\": \"2026-05-20 10:05:00\"\n  }\n}"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "cookie": [],
+              "body": "{\n  \"messages\": [\"Invalid store credentials.\"],\n  \"data\": null,\n  \"code\": 422\n}"
+            },
+            {
+              "name": "404 Transaction not found",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {"key": "Content-Type", "value": "application/json"},
+                  {"key": "Accept", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"merchant_mobile_no\": \"+9647712345678\",\n  \"store_password\": \"test@store123\",\n  \"order_id\": \"REF-NOT-FOUND\"\n}",
+                  "options": {"raw": {"language": "json"}}
+                },
+                "url": {
+                  "raw": "{{base_url}}/merchant/payment/validation",
+                  "host": ["{{base_url}}"],
+                  "path": ["merchant", "payment", "validation"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{"key": "Content-Type", "value": "application/json"}],
+              "cookie": [],
+              "body": "{\n  \"messages\": [\"Transaction not found.\"],\n  \"data\": null,\n  \"code\": 404\n}"
             }
           ]
         }
       ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://dev.zicharge.com",
+      "description": "Base URL. Use https://dev.zicharge.com for sandbox, https://secure.zicharge.com for production."
+    },
+    {
+      "key": "merchant_mobile_no",
+      "value": "+9647712345678",
+      "description": "Your provisioned merchant wallet number (E.164 format)."
+    },
+    {
+      "key": "store_password",
+      "value": "your-store-password",
+      "description": "Your provisioned store password. Never expose this client-side."
+    },
+    {
+      "key": "ipn_url",
+      "value": "https://yoursite.com/webhooks/zicharge/ipn",
+      "description": "Your publicly accessible IPN listener endpoint (HTTPS only)."
+    },
+    {
+      "key": "order_id",
+      "value": "ORD-2026-000001",
+      "description": "Your unique order ID. Reusing the same order_id will not double-charge."
+    },
+    {
+      "key": "customer_mobile_no",
+      "value": "+9647701234567",
+      "description": "The customer's ZiCharge wallet number (E.164 format)."
+    },
+    {
+      "key": "api_key",
+      "value": "",
+      "description": "Merchant API key for cashback auth. Generate via POST /api/v3/merchant/generate-api-key, then paste the returned api_key here. Use as Authorization: Bearer {{api_key}}."
     }
   ]
 }

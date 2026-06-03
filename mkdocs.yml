@@ -80,6 +80,7 @@ nav:
     - IPN Callback: deposit/ipn-callback.md
     - Validate Payment: deposit/validate-payment.md
   - Withdrawal:
+    - Generate API Key: withdrawal/generate-api-key.md
     - Cashback: withdrawal/cashback.md
     - Validate Payment: withdrawal/validate-payment.md
   - Authentication & Security: 02-authentication.md

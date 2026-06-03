@@ -284,7 +284,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../withdrawal/cashback/" class="md-tabs__link">
+        <a href="../withdrawal/generate-api-key/" class="md-tabs__link">
           
   
   
@@ -627,6 +627,8 @@
       
         
       
+        
+      
     
     
     
@@ -671,6 +673,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../withdrawal/generate-api-key/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generate API Key
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -811,6 +841,34 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Merchant credentials">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#store-credentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Store credentials
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api-key-bearer-token" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API key (Bearer token)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1045,6 +1103,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Merchant credentials">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#store-credentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Store credentials
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api-key-bearer-token" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API key (Bearer token)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1176,7 +1262,7 @@
 <div class="zi-trust-card__num">1</div>
 <p><strong>Server-to-Server</strong></p>
 <p>Your backend → ZiCharge Gateway</p>
-<p><code>merchant_mobile_no</code> + <code>store_password</code> over HTTPS. Optionally hardened with a source IP allow-list.</p>
+<p><code>merchant_mobile_no</code> + <code>store_password</code> in body, or <code>Authorization: Bearer &lt;api_key&gt;</code> header. Optionally hardened with a source IP allow-list.</p>
 </div>
 <div class="zi-trust-card">
 <div class="zi-trust-card__num">2</div>
@@ -1193,12 +1279,13 @@
 </div>
 <hr />
 <h2 id="merchant-credentials">Merchant credentials<a class="headerlink" href="#merchant-credentials" title="Permanent link">&para;</a></h2>
+<h3 id="store-credentials">Store credentials<a class="headerlink" href="#store-credentials" title="Permanent link">&para;</a></h3>
 <p>Two values provisioned at onboarding through the ZiCharge merchant dashboard:</p>
 <div class="zi-info-row">
 <div class="zi-info-box">
 <p><strong><code>merchant_mobile_no</code></strong></p>
 <p>Format: <code>+964XXXXXXXXXX</code></p>
-<p>Public identifier of your merchant wallet. Sent on every server-to-server call.</p>
+<p>Public identifier of your merchant wallet. Sent on every server-to-server call (when not using Bearer auth).</p>
 </div>
 <div class="zi-info-box">
 <p><strong><code>store_password</code></strong></p>
@@ -1210,6 +1297,15 @@
 <p class="admonition-title">store_password must never leave your server</p>
 <p>Never embed it in mobile binaries, browser-side JavaScript, or include it in any URL. All credentialed calls are server-to-server only. Credentials are validated as a <strong>pair</strong> — the gateway will not tell you which one failed (prevents account enumeration).</p>
 </div>
+<h3 id="api-key-bearer-token">API key (Bearer token)<a class="headerlink" href="#api-key-bearer-token" title="Permanent link">&para;</a></h3>
+<p>For Cashback requests, you can generate an API key via <code>POST /api/v3/merchant/generate-api-key</code> and pass it as:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Authorization: Bearer &lt;api_key&gt;
+</span></code></pre></div>
+<p>When this header is present, <code>merchant_mobile_no</code> and <code>store_password</code> are <strong>not required</strong> in the request body. This is the recommended approach — it keeps secrets out of every request body and enables clean key rotation.</p>
+<div class="admonition danger">
+<p class="admonition-title">Treat the API key like store_password</p>
+<p>Store in an environment variable or secrets manager. Never log it, never commit it to source control, never expose it client-side. Regenerating immediately invalidates the previous key.</p>
+</div>
 <hr />
 <h2 id="endpoint-credential-requirements">Endpoint credential requirements<a class="headerlink" href="#endpoint-credential-requirements" title="Permanent link">&para;</a></h2>
 <table>
@@ -1218,6 +1314,7 @@
 <th>Endpoint</th>
 <th style="text-align: center;"><code>merchant_mobile_no</code></th>
 <th style="text-align: center;"><code>store_password</code></th>
+<th style="text-align: center;">Bearer <code>api_key</code></th>
 </tr>
 </thead>
 <tbody>
@@ -1225,36 +1322,31 @@
 <td><code>POST /merchant/generate-payment-token</code></td>
 <td style="text-align: center;">Required</td>
 <td style="text-align: center;">Required</td>
+<td style="text-align: center;">—</td>
 </tr>
 <tr>
 <td><code>POST /merchant/generate-qr-token</code></td>
 <td style="text-align: center;">Required</td>
 <td style="text-align: center;">Required</td>
+<td style="text-align: center;">—</td>
 </tr>
 <tr>
-<td><code>POST /merchant/validate-payment</code></td>
+<td><code>POST /merchant/payment/validation</code></td>
 <td style="text-align: center;">Required</td>
 <td style="text-align: center;">Required</td>
+<td style="text-align: center;">—</td>
 </tr>
 <tr>
-<td><code>POST /merchant/cash-back</code></td>
+<td><code>POST /api/v3/merchant/generate-api-key</code></td>
 <td style="text-align: center;">Required</td>
 <td style="text-align: center;">Required</td>
+<td style="text-align: center;">—</td>
 </tr>
 <tr>
-<td><code>POST /merchant/fetch-payment-status</code></td>
-<td style="text-align: center;">Required</td>
-<td style="text-align: center;">Not required — order ID + amount serve as proof</td>
-</tr>
-<tr>
-<td><code>POST /merchant/fetch-payment-token-data</code></td>
-<td style="text-align: center;">Not required</td>
-<td style="text-align: center;">Not required — token is the lookup key</td>
-</tr>
-<tr>
-<td><code>POST /merchant/payment/direct</code></td>
-<td style="text-align: center;">Not required</td>
-<td style="text-align: center;">Not required — customer credentials, not merchant</td>
+<td><code>POST /api/v3/merchant/cash-back</code></td>
+<td style="text-align: center;">Conditional</td>
+<td style="text-align: center;">Conditional</td>
+<td style="text-align: center;">Preferred — replaces body credentials</td>
 </tr>
 </tbody>
 </table>
@@ -1275,7 +1367,7 @@
 </div>
 <hr />
 <h2 id="ipn-signature-verification">IPN signature verification<a class="headerlink" href="#ipn-signature-verification" title="Permanent link">&para;</a></h2>
-<p>When payload signatures are enabled on your merchant config, every IPN includes three headers that prove the callback originated from ZiCharge:</p>
+<p>When payload signatures are enabled on your merchant config, every IPN includes one header that proves the callback originated from ZiCharge:</p>
 <table>
 <thead>
 <tr>
@@ -1286,101 +1378,99 @@
 <tbody>
 <tr>
 <td><code>X-ZiCharge-Signature</code></td>
-<td>Hex HMAC-SHA256 of the <strong>raw</strong> form body, signed with your <code>ipn_secret</code></td>
-</tr>
-<tr>
-<td><code>X-ZiCharge-Timestamp</code></td>
-<td>Unix epoch seconds at dispatch time — use to detect replay attacks</td>
-</tr>
-<tr>
-<td><code>X-ZiCharge-Request-Id</code></td>
-<td>Opaque request ID for deduplication and support correlation</td>
+<td><code>t=&lt;epoch&gt;,v1=&lt;hex-hmac&gt;</code> — Stripe-style compound value. <code>t</code> is the Unix dispatch timestamp; <code>v1</code> is the HMAC-SHA256 hex digest over <code>t + "." + raw_body</code>.</td>
 </tr>
 </tbody>
 </table>
+<p>The signed payload is:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>signed_payload = t + &quot;.&quot; + raw_body
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>expected       = HMAC-SHA256(webhook_secret, signed_payload)
+</span></code></pre></div>
+<p>Reject any IPN where <code>|now - t| &gt; 300</code> seconds.</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Java</label><label for="__tabbed_1_2">PHP</label><label for="__tabbed_1_3">JavaScript</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="language-java highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">javax.crypto.Mac</span><span class="p">;</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">javax.crypto.spec.SecretKeySpec</span><span class="p">;</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.security.MessageDigest</span><span class="p">;</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.Map</span><span class="p">;</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">verifyIpn</span><span class="p">(</span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">rawBody</span><span class="p">,</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">headers</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">ipnSecret</span><span class="p">)</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">        </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="c1">// 1 — Signature check (constant-time comparison prevents timing attacks)</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">    </span><span class="n">Mac</span><span class="w"> </span><span class="n">mac</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Mac</span><span class="p">.</span><span class="na">getInstance</span><span class="p">(</span><span class="s">&quot;HmacSHA256&quot;</span><span class="p">);</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">    </span><span class="n">mac</span><span class="p">.</span><span class="na">init</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">SecretKeySpec</span><span class="p">(</span><span class="n">ipnSecret</span><span class="p">.</span><span class="na">getBytes</span><span class="p">(</span><span class="s">&quot;UTF-8&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;HmacSHA256&quot;</span><span class="p">));</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">    </span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">hmacBytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mac</span><span class="p">.</span><span class="na">doFinal</span><span class="p">(</span><span class="n">rawBody</span><span class="p">);</span>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">    </span><span class="n">StringBuilder</span><span class="w"> </span><span class="n">sb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">StringBuilder</span><span class="p">();</span>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">byte</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">hmacBytes</span><span class="p">)</span><span class="w"> </span><span class="n">sb</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;%02x&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">));</span>
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">expected</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sb</span><span class="p">.</span><span class="na">toString</span><span class="p">();</span>
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">received</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">headers</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;X-ZiCharge-Signature&quot;</span><span class="p">);</span>
-</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">MessageDigest</span><span class="p">.</span><span class="na">isEqual</span><span class="p">(</span><span class="n">expected</span><span class="p">.</span><span class="na">getBytes</span><span class="p">(),</span><span class="w"> </span><span class="n">received</span><span class="p">.</span><span class="na">getBytes</span><span class="p">()))</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
-</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>
-</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">    </span><span class="c1">// 2 — Reject stale requests (&gt; 5 minute clock drift)</span>
-</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">    </span><span class="kt">long</span><span class="w"> </span><span class="n">ts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Long</span><span class="p">.</span><span class="na">parseLong</span><span class="p">(</span><span class="n">headers</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="s">&quot;X-ZiCharge-Timestamp&quot;</span><span class="p">));</span>
-</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Math</span><span class="p">.</span><span class="na">abs</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">currentTimeMillis</span><span class="p">()</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">1000L</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">ts</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">300</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
-</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>
-</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
-</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="p">}</span>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">verifyIpn</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">rawBody</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">signatureHeader</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">webhookSecret</span><span class="p">)</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">        </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="c1">// 1 — Parse header: t=&lt;epoch&gt;,v1=&lt;hmac&gt;</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">timestamp</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">signatureHeader</span><span class="p">.</span><span class="na">replaceFirst</span><span class="p">(</span><span class="s">&quot;.*t=(\\d+).*&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;$1&quot;</span><span class="p">);</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">receivedHmac</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">signatureHeader</span><span class="p">.</span><span class="na">replaceFirst</span><span class="p">(</span><span class="s">&quot;.*v1=([a-f0-9]+).*&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;$1&quot;</span><span class="p">);</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">    </span><span class="c1">// 2 — Timestamp drift check</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">    </span><span class="kt">long</span><span class="w"> </span><span class="n">ts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Long</span><span class="p">.</span><span class="na">parseLong</span><span class="p">(</span><span class="n">timestamp</span><span class="p">);</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Math</span><span class="p">.</span><span class="na">abs</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">currentTimeMillis</span><span class="p">()</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">1000L</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">ts</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">300</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">    </span><span class="c1">// 3 — Build signed payload and compute HMAC</span>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">signedPayload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">timestamp</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;.&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">rawBody</span><span class="p">;</span>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="w">    </span><span class="n">Mac</span><span class="w"> </span><span class="n">mac</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Mac</span><span class="p">.</span><span class="na">getInstance</span><span class="p">(</span><span class="s">&quot;HmacSHA256&quot;</span><span class="p">);</span>
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">    </span><span class="n">mac</span><span class="p">.</span><span class="na">init</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">SecretKeySpec</span><span class="p">(</span><span class="n">webhookSecret</span><span class="p">.</span><span class="na">getBytes</span><span class="p">(</span><span class="s">&quot;UTF-8&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;HmacSHA256&quot;</span><span class="p">));</span>
+</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">    </span><span class="n">StringBuilder</span><span class="w"> </span><span class="n">sb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">StringBuilder</span><span class="p">();</span>
+</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">byte</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">mac</span><span class="p">.</span><span class="na">doFinal</span><span class="p">(</span><span class="n">signedPayload</span><span class="p">.</span><span class="na">getBytes</span><span class="p">(</span><span class="s">&quot;UTF-8&quot;</span><span class="p">)))</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="w">        </span><span class="n">sb</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="s">&quot;%02x&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">));</span>
+</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-2-21"><a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>
+</span><span id="__span-2-22"><a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="w">    </span><span class="c1">// 4 — Constant-time comparison (prevents timing attacks)</span>
+</span><span id="__span-2-23"><a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">MessageDigest</span><span class="p">.</span><span class="na">isEqual</span><span class="p">(</span><span class="n">sb</span><span class="p">.</span><span class="na">toString</span><span class="p">().</span><span class="na">getBytes</span><span class="p">(),</span><span class="w"> </span><span class="n">receivedHmac</span><span class="p">.</span><span class="na">getBytes</span><span class="p">());</span>
+</span><span id="__span-2-24"><a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a><span class="p">}</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="language-php highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="x">function verifyIpn(string $rawBody, array $headers, string $ipnSecret): bool {</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="x">    // 1 — Signature check</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="x">    $expected = hash_hmac(&#39;sha256&#39;, $rawBody, $ipnSecret);</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="x">    if (!hash_equals($expected, $headers[&#39;X-ZiCharge-Signature&#39;])) {</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="x">        return false;</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="x">    }</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="x">    // 2 — Reject stale requests (&gt; 5 minute clock drift)</span>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="x">    $ts = (int) $headers[&#39;X-ZiCharge-Timestamp&#39;];</span>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="x">    if (abs(time() - $ts) &gt; 300) {</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="x">        return false;</span>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="x">    }</span>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="x">    return true;</span>
-</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="x">}</span>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="x">function verifyIpn(string $rawBody, string $sigHeader, string $webhookSecret): bool {</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="x">    // 1 — Parse header: t=&lt;epoch&gt;,v1=&lt;hmac&gt;</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="x">    preg_match(&#39;/t=(\d+),v1=([a-f0-9]+)/&#39;, $sigHeader, $m);</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="x">    $timestamp    = $m[1];</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="x">    $receivedHmac = $m[2];</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="x">    // 2 — Timestamp drift check</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="x">    if (abs(time() - (int) $timestamp) &gt; 300) {</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="x">        return false;</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="x">    }</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="x">    // 3 — Verify signature</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="x">    $signedPayload = $timestamp . &#39;.&#39; . $rawBody;</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="x">    $expected = hash_hmac(&#39;sha256&#39;, $signedPayload, $webhookSecret);</span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="x">    return hash_equals($expected, $receivedHmac);</span>
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="x">}</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="language-javascript highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kd">const</span><span class="w"> </span><span class="nx">crypto</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;crypto&#39;</span><span class="p">);</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="kd">function</span><span class="w"> </span><span class="nx">verifyIpn</span><span class="p">(</span><span class="nx">rawBody</span><span class="p">,</span><span class="w"> </span><span class="nx">headers</span><span class="p">,</span><span class="w"> </span><span class="nx">ipnSecret</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="c1">// 1 — Signature check (timingSafeEqual prevents timing attacks)</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">expected</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">crypto</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">        </span><span class="p">.</span><span class="nx">createHmac</span><span class="p">(</span><span class="s1">&#39;sha256&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">ipnSecret</span><span class="p">)</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">        </span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">rawBody</span><span class="p">)</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">        </span><span class="p">.</span><span class="nx">digest</span><span class="p">(</span><span class="s1">&#39;hex&#39;</span><span class="p">);</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">received</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">(</span><span class="nx">headers</span><span class="p">[</span><span class="s1">&#39;x-zicharge-signature&#39;</span><span class="p">]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;utf8&#39;</span><span class="p">);</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">crypto</span><span class="p">.</span><span class="nx">timingSafeEqual</span><span class="p">(</span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">(</span><span class="nx">expected</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;utf8&#39;</span><span class="p">),</span><span class="w"> </span><span class="nx">received</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">    </span><span class="c1">// 2 — Reject stale requests (&gt; 5 minute clock drift)</span>
-</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">ts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">parseInt</span><span class="p">(</span><span class="nx">headers</span><span class="p">[</span><span class="s1">&#39;x-zicharge-timestamp&#39;</span><span class="p">],</span><span class="w"> </span><span class="mf">10</span><span class="p">);</span>
-</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">abs</span><span class="p">(</span><span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">()</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">1000</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nx">ts</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">300</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
-</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>
-</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
-</span><span id="__span-2-21"><a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="p">}</span>
+<div class="language-javascript highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">const</span><span class="w"> </span><span class="nx">crypto</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;crypto&#39;</span><span class="p">);</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="kd">function</span><span class="w"> </span><span class="nx">verifyIpn</span><span class="p">(</span><span class="nx">rawBody</span><span class="p">,</span><span class="w"> </span><span class="nx">sigHeader</span><span class="p">,</span><span class="w"> </span><span class="nx">webhookSecret</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="c1">// 1 — Parse header: t=&lt;epoch&gt;,v1=&lt;hmac&gt;</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">match</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">sigHeader</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="p">).</span><span class="nx">match</span><span class="p">(</span><span class="sr">/t=(\d+),v1=([a-f0-9]+)/</span><span class="p">);</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">match</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="p">[,</span><span class="w"> </span><span class="nx">timestamp</span><span class="p">,</span><span class="w"> </span><span class="nx">receivedHmac</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">match</span><span class="p">;</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">    </span><span class="c1">// 2 — Timestamp drift check</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">abs</span><span class="p">(</span><span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">()</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">1000</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nb">parseInt</span><span class="p">(</span><span class="nx">timestamp</span><span class="p">,</span><span class="w"> </span><span class="mf">10</span><span class="p">))</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">300</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">    </span><span class="c1">// 3 — Verify signature (timingSafeEqual prevents timing attacks)</span>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">signedPayload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sb">`</span><span class="si">${</span><span class="nx">timestamp</span><span class="si">}</span><span class="sb">.</span><span class="si">${</span><span class="nx">rawBody</span><span class="si">}</span><span class="sb">`</span><span class="p">;</span>
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">expected</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">crypto</span>
+</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="w">        </span><span class="p">.</span><span class="nx">createHmac</span><span class="p">(</span><span class="s1">&#39;sha256&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">webhookSecret</span><span class="p">)</span>
+</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="w">        </span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">signedPayload</span><span class="p">)</span>
+</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="w">        </span><span class="p">.</span><span class="nx">digest</span><span class="p">(</span><span class="s1">&#39;hex&#39;</span><span class="p">);</span>
+</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">crypto</span><span class="p">.</span><span class="nx">timingSafeEqual</span><span class="p">(</span>
+</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a><span class="w">        </span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">(</span><span class="nx">expected</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;utf8&#39;</span><span class="p">),</span>
+</span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="w">        </span><span class="nx">Buffer</span><span class="p">.</span><span class="kr">from</span><span class="p">(</span><span class="nx">receivedHmac</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;utf8&#39;</span><span class="p">)</span>
+</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a><span class="w">    </span><span class="p">);</span>
+</span><span id="__span-4-24"><a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a><span class="p">}</span>
 </span></code></pre></div>
 </div>
 </div>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Always verify the raw body bytes</p>
-<p>Compute the HMAC against the <strong>raw request bytes</strong> before any parsing. Re-encoding parsed form fields changes byte order and the signature will not match.</p>
+<p>Build <code>signed_payload</code> from the <strong>raw request bytes</strong> before any parsing. Re-encoding parsed form fields changes byte order and the signature will not match.</p>
 </div>
 <div class="admonition tip">
 <p class="admonition-title">Zero-downtime secret rotation</p>
-<p>The gateway supports <strong>two active <code>ipn_secret</code> values</strong> simultaneously. Provision the new secret, deploy your listener to accept both, then retire the old one — no IPNs are dropped during rotation.</p>
+<p>The gateway supports <strong>two active <code>webhook_secret</code> values</strong> simultaneously. Provision the new secret, deploy your listener to accept both, then retire the old one — no IPNs are dropped during rotation.</p>
 </div>
 <hr />
 <h2 id="idempotency">Idempotency<a class="headerlink" href="#idempotency" title="Permanent link">&para;</a></h2>
@@ -1405,7 +1495,7 @@
 </tr>
 <tr>
 <td>IPN delivery</td>
-<td><code>X-ZiCharge-Request-Id</code> header</td>
+<td><code>(order_id, status)</code> pair</td>
 <td>Deduplicate on your side — gateway may re-deliver on retry</td>
 </tr>
 <tr>
@@ -1431,7 +1521,7 @@
 </tr>
 <tr>
 <td>IPN callbacks</td>
-<td><code>X-ZiCharge-Timestamp</code> + HMAC signature pair — reject any IPN older than ±5 minutes</td>
+<td><code>X-ZiCharge-Signature</code> (<code>t=&lt;epoch&gt;,v1=&lt;hmac&gt;</code>) — reject any IPN where <code>\|now - t\| &gt; 300s</code></td>
 </tr>
 </tbody>
 </table>

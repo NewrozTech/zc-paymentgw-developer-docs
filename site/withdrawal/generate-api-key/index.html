@@ -12,13 +12,13 @@
         <meta name="author" content="ZiCharge Engineering">
       
       
-        <link rel="canonical" href="https://newroztech.github.io/zc-paymentgw-developer-docs/withdrawal/validate-payment/">
+        <link rel="canonical" href="https://newroztech.github.io/zc-paymentgw-developer-docs/withdrawal/generate-api-key/">
       
       
-        <link rel="prev" href="../cashback/">
+        <link rel="prev" href="../../deposit/validate-payment/">
       
       
-        <link rel="next" href="../../02-authentication/">
+        <link rel="next" href="../cashback/">
       
       
         
@@ -29,7 +29,7 @@
     
     
       
-        <title>Validate Payment - ZiCharge Merchant API</title>
+        <title>Generate API Key - ZiCharge Merchant API</title>
       
     
     
@@ -82,7 +82,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#validate-payment" class="md-skip">
+        <a href="#generate-api-key" class="md-skip">
           Skip to content
         </a>
       
@@ -116,7 +116,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Validate Payment
+              Generate API Key
             
           </span>
         </div>
@@ -286,7 +286,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../cashback/" class="md-tabs__link">
+        <a href="./" class="md-tabs__link">
           
   
   
@@ -629,6 +629,8 @@
       
         
       
+        
+      
     
     
     
@@ -681,34 +683,6 @@
                 
   
   
-  
-  
-    <li class="md-nav__item">
-      <a href="../cashback/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Cashback
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
     
   
   
@@ -728,7 +702,7 @@
   <span class="md-ellipsis">
     
   
-    Validate Payment
+    Generate API Key
   
 
     
@@ -746,7 +720,7 @@
   <span class="md-ellipsis">
     
   
-    Validate Payment
+    Generate API Key
   
 
     
@@ -818,10 +792,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#when-to-call" class="md-nav__link">
+  <a href="#using-the-api-key" class="md-nav__link">
     <span class="md-ellipsis">
       
-        When to call
+        Using the API key
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#important-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Important notes
       
     </span>
   </a>
@@ -843,6 +828,62 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cashback/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cashback
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../validate-payment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Validate Payment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1036,10 +1077,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#when-to-call" class="md-nav__link">
+  <a href="#using-the-api-key" class="md-nav__link">
     <span class="md-ellipsis">
       
-        When to call
+        Using the API key
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#important-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Important notes
       
     </span>
   </a>
@@ -1074,13 +1126,16 @@
 
 
 
-<h1 id="validate-payment">Validate Payment<a class="headerlink" href="#validate-payment" title="Permanent link">&para;</a></h1>
-<p>Confirms the status of a cashback transaction by passing the <code>reference_id</code> as <code>order_id</code>. Returns the canonical <code>tx_unique_id</code> for your records. Safe to call multiple times.</p>
+<h1 id="generate-api-key">Generate API Key<a class="headerlink" href="#generate-api-key" title="Permanent link">&para;</a></h1>
+<p>Generate (or regenerate) a merchant API key for authenticating cashback requests. The key is returned <strong>once only</strong> — store it securely as you would a password.</p>
+<div class="admonition tip">
+<p class="admonition-title">Use Bearer auth for cashback</p>
+<p>Once you have an API key, pass it as <code>Authorization: Bearer &lt;api_key&gt;</code> on every Cashback request. You no longer need to include <code>merchant_mobile_no</code> or <code>store_password</code> in the request body — the key is sufficient.</p>
+</div>
 <hr />
 <h2 id="endpoint">Endpoint<a class="headerlink" href="#endpoint" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>POST /merchant/payment/validation
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>POST /api/v3/merchant/generate-api-key
 </span></code></pre></div>
-<p>Also available at alias: <code>/merchant/validate-payment</code></p>
 <table>
 <thead>
 <tr>
@@ -1104,14 +1159,13 @@
 <div class="tabbed-set tabbed-alternate" data-tabs="1:4"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><input id="__tabbed_1_4" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">cURL</label><label for="__tabbed_1_2">Java</label><label for="__tabbed_1_3">PHP</label><label for="__tabbed_1_4">JavaScript</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>https://secure.zicharge.com/merchant/payment/validation<span class="w"> </span><span class="se">\</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>https://secure.zicharge.com/api/v3/merchant/generate-api-key<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Accept: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{</span>
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="s1">    &quot;merchant_mobile_no&quot;: &quot;+9647712345678&quot;,</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="s1">    &quot;store_password&quot;: &quot;your-store-password&quot;,</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="s1">    &quot;order_id&quot;: &quot;CB-2026-000001&quot;</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="s1">  }&#39;</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="s1">    &quot;store_password&quot;: &quot;your-store-password&quot;</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="s1">  }&#39;</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
@@ -1120,55 +1174,52 @@
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">String</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;&quot;</span>
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="s">    {</span>
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="s">      &quot;merchant_mobile_no&quot;: &quot;+9647712345678&quot;,</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="s">      &quot;store_password&quot;: &quot;your-store-password&quot;,</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="s">      &quot;order_id&quot;: &quot;CB-2026-000001&quot;</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="s">    }</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="s">    &quot;&quot;&quot;</span><span class="p">;</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="n">HttpRequest</span><span class="w"> </span><span class="n">request</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HttpRequest</span><span class="p">.</span><span class="na">newBuilder</span><span class="p">()</span>
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">    </span><span class="p">.</span><span class="na">uri</span><span class="p">(</span><span class="n">URI</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;https://secure.zicharge.com/merchant/payment/validation&quot;</span><span class="p">))</span>
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">    </span><span class="p">.</span><span class="na">header</span><span class="p">(</span><span class="s">&quot;Content-Type&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;application/json&quot;</span><span class="p">)</span>
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">    </span><span class="p">.</span><span class="na">header</span><span class="p">(</span><span class="s">&quot;Accept&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;application/json&quot;</span><span class="p">)</span>
-</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="w">    </span><span class="p">.</span><span class="na">POST</span><span class="p">(</span><span class="n">HttpRequest</span><span class="p">.</span><span class="na">BodyPublishers</span><span class="p">.</span><span class="na">ofString</span><span class="p">(</span><span class="n">body</span><span class="p">))</span>
-</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
-</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>
-</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="n">HttpResponse</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="na">send</span><span class="p">(</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="n">HttpResponse</span><span class="p">.</span><span class="na">BodyHandlers</span><span class="p">.</span><span class="na">ofString</span><span class="p">());</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="s">      &quot;store_password&quot;: &quot;your-store-password&quot;</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="s">    }</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="s">    &quot;&quot;&quot;</span><span class="p">;</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="n">HttpRequest</span><span class="w"> </span><span class="n">request</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HttpRequest</span><span class="p">.</span><span class="na">newBuilder</span><span class="p">()</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">    </span><span class="p">.</span><span class="na">uri</span><span class="p">(</span><span class="n">URI</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;https://secure.zicharge.com/api/v3/merchant/generate-api-key&quot;</span><span class="p">))</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">    </span><span class="p">.</span><span class="na">header</span><span class="p">(</span><span class="s">&quot;Content-Type&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;application/json&quot;</span><span class="p">)</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">    </span><span class="p">.</span><span class="na">header</span><span class="p">(</span><span class="s">&quot;Accept&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;application/json&quot;</span><span class="p">)</span>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">    </span><span class="p">.</span><span class="na">POST</span><span class="p">(</span><span class="n">HttpRequest</span><span class="p">.</span><span class="na">BodyPublishers</span><span class="p">.</span><span class="na">ofString</span><span class="p">(</span><span class="n">body</span><span class="p">))</span>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>
+</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="n">HttpResponse</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="na">send</span><span class="p">(</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="n">HttpResponse</span><span class="p">.</span><span class="na">BodyHandlers</span><span class="p">.</span><span class="na">ofString</span><span class="p">());</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
 <div class="language-php highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="x">$payload = [</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="x">    &#39;merchant_mobile_no&#39; =&gt; &#39;+9647712345678&#39;,</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="x">    &#39;store_password&#39;     =&gt; &#39;your-store-password&#39;,</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="x">    &#39;order_id&#39;           =&gt; &#39;CB-2026-000001&#39;,</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="x">];</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="x">$ch = curl_init(&#39;https://secure.zicharge.com/merchant/payment/validation&#39;);</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="x">curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="x">curl_setopt($ch, CURLOPT_POST, true);</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="x">curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));</span>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="x">curl_setopt($ch, CURLOPT_HTTPHEADER, [</span>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="x">    &#39;Content-Type: application/json&#39;,</span>
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="x">    &#39;Accept: application/json&#39;,</span>
-</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="x">]);</span>
-</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>
-</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="x">$response = json_decode(curl_exec($ch), true);</span>
-</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="x">curl_close($ch);</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="x">];</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="x">$ch = curl_init(&#39;https://secure.zicharge.com/api/v3/merchant/generate-api-key&#39;);</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="x">curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="x">curl_setopt($ch, CURLOPT_POST, true);</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="x">curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="x">curl_setopt($ch, CURLOPT_HTTPHEADER, [</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="x">    &#39;Content-Type: application/json&#39;,</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="x">    &#39;Accept: application/json&#39;,</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="x">]);</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="x">$response = json_decode(curl_exec($ch), true);</span>
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="x">curl_close($ch);</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
 <div class="language-javascript highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">fetch</span><span class="p">(</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="s1">&#39;https://secure.zicharge.com/merchant/payment/validation&#39;</span><span class="p">,</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="s1">&#39;https://secure.zicharge.com/api/v3/merchant/generate-api-key&#39;</span><span class="p">,</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="p">{</span>
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="nx">method</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;POST&#39;</span><span class="p">,</span>
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="nx">headers</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s1">&#39;Content-Type&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;application/json&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;Accept&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;application/json&#39;</span><span class="w"> </span><span class="p">},</span>
 </span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="nx">body</span><span class="o">:</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span>
 </span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">      </span><span class="nx">merchant_mobile_no</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;+9647712345678&#39;</span><span class="p">,</span>
 </span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">      </span><span class="nx">store_password</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;your-store-password&#39;</span><span class="p">,</span>
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">      </span><span class="nx">order_id</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;CB-2026-000001&#39;</span><span class="p">,</span>
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">    </span><span class="p">}),</span>
-</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="p">);</span>
-</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="kd">const</span><span class="w"> </span><span class="nx">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">response</span><span class="p">.</span><span class="nx">json</span><span class="p">();</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">    </span><span class="p">}),</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="p">);</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="kd">const</span><span class="w"> </span><span class="nx">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">response</span><span class="p">.</span><span class="nx">json</span><span class="p">();</span>
 </span></code></pre></div>
 </div>
 </div>
@@ -1197,29 +1248,24 @@
 <td>Required</td>
 <td>Your store password.</td>
 </tr>
-<tr>
-<td><code>order_id</code></td>
-<td>string</td>
-<td>Required</td>
-<td>Pass the <code>reference_id</code> from the <a href="../cashback/">Cashback</a> request as <code>order_id</code>.</td>
-</tr>
 </tbody>
 </table>
 <hr />
 <h2 id="response">Response<a class="headerlink" href="#response" title="Permanent link">&para;</a></h2>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:1"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Success</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
 <div class="language-json highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">{</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nt">&quot;messages&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;Please find your transaction details.&quot;</span><span class="p">],</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nt">&quot;messages&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="nt">&quot;tx_unique_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CVIBAON916&quot;</span><span class="p">,</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="nt">&quot;order_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CB-2026-000001&quot;</span><span class="p">,</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="nt">&quot;bill_amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1000</span><span class="p">,</span>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="nt">&quot;customer_account_no&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;+9647701234567&quot;</span><span class="p">,</span>
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">    </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Success&quot;</span><span class="p">,</span>
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">    </span><span class="nt">&quot;received_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-05-20 18:39:25&quot;</span>
-</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="p">}</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="nt">&quot;api_key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;a3f8e2c1d5b94f7e2a1c8d3e6f9b0c4d7e2a1b5c8d3f6e9a0b4c7d2e5f8a1b4&quot;</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="p">}</span>
 </span></code></pre></div>
+</div>
+</div>
+</div>
 <table>
 <thead>
 <tr>
@@ -1230,48 +1276,31 @@
 </thead>
 <tbody>
 <tr>
-<td><code>data.tx_unique_id</code></td>
+<td><code>data.api_key</code></td>
 <td>string</td>
-<td>Public transaction reference. <strong>Use this in your ledger and for support queries.</strong></td>
-</tr>
-<tr>
-<td><code>data.order_id</code></td>
-<td>string</td>
-<td>The <code>reference_id</code> you passed as <code>order_id</code>.</td>
-</tr>
-<tr>
-<td><code>data.bill_amount</code></td>
-<td>integer</td>
-<td>Credited amount in IQD.</td>
-</tr>
-<tr>
-<td><code>data.customer_account_no</code></td>
-<td>string</td>
-<td>Recipient wallet number.</td>
-</tr>
-<tr>
-<td><code>data.status</code></td>
-<td>string</td>
-<td><code>"Success"</code> for a settled cashback.</td>
-</tr>
-<tr>
-<td><code>data.received_at</code></td>
-<td>string</td>
-<td>UTC timestamp <code>"yyyy-MM-dd HH:mm:ss"</code>.</td>
+<td>Your merchant API key. <strong>Shown once — copy it now.</strong> Use as <code>Authorization: Bearer &lt;api_key&gt;</code> on Cashback requests.</td>
 </tr>
 </tbody>
 </table>
 <hr />
-<h2 id="when-to-call">When to call<a class="headerlink" href="#when-to-call" title="Permanent link">&para;</a></h2>
-<p>Because cashback settles synchronously, <code>tx_unique_id</code> is already returned in the <a href="../cashback/">Cashback</a> response. Validate Payment is useful when:</p>
-<ul>
-<li>You need to <strong>re-fetch</strong> the transaction record after the fact.</li>
-<li>Your cashback call <strong>timed out</strong> and you need to check whether the credit was applied before retrying.</li>
-<li>You want a <strong>consistent reconciliation pattern</strong> across both deposit and withdrawal flows.</li>
-</ul>
-<div class="admonition tip">
-<p class="admonition-title">Always record <code>tx_unique_id</code></p>
-<p>Include it in all support queries. It is the canonical ZiCharge reference for the transaction.</p>
+<h2 id="using-the-api-key">Using the API key<a class="headerlink" href="#using-the-api-key" title="Permanent link">&para;</a></h2>
+<p>Once generated, include the key in the <code>Authorization</code> header on every <a href="../cashback/">Cashback</a> request:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Authorization: Bearer a3f8e2c1d5b94f7e2a1c8d3e6f9b0c4d7e2a1b5c8d3f6e9a0b4c7d2e5f8a1b4
+</span></code></pre></div>
+<p>When the Bearer token is present, <code>merchant_mobile_no</code> and <code>store_password</code> are <strong>not required</strong> in the Cashback request body.</p>
+<hr />
+<h2 id="important-notes">Important notes<a class="headerlink" href="#important-notes" title="Permanent link">&para;</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Key is shown once</p>
+<p>The <code>api_key</code> is returned only in this response. If you lose it, regenerate a new one — the old key is immediately invalidated.</p>
+</div>
+<div class="admonition danger">
+<p class="admonition-title">Regeneration invalidates the previous key</p>
+<p>Calling this endpoint again issues a new key and <strong>immediately invalidates</strong> the previous one. Any in-flight Cashback requests using the old key will fail. Plan key rotations carefully.</p>
+</div>
+<div class="admonition danger">
+<p class="admonition-title">Treat the API key like store_password</p>
+<p>Store it in an environment variable or secrets manager. Never log it, never expose it client-side, never commit it to source control.</p>
 </div>
 <hr />
 <h2 id="error-responses">Error responses<a class="headerlink" href="#error-responses" title="Permanent link">&para;</a></h2>
@@ -1287,12 +1316,7 @@
 <tr>
 <td><code>200</code></td>
 <td>—</td>
-<td>Check <code>data.status</code></td>
-</tr>
-<tr>
-<td><code>404</code></td>
-<td><code>Transaction not found.</code></td>
-<td>Verify <code>order_id</code> matches the <code>reference_id</code> used in Cashback</td>
+<td>Copy <code>data.api_key</code> immediately</td>
 </tr>
 <tr>
 <td><code>422</code></td>
@@ -1337,7 +1361,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../cashback/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Cashback">
+          <a href="../../deposit/validate-payment/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Validate Payment">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -1347,20 +1371,20 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                Cashback
+                Validate Payment
               </div>
             </div>
           </a>
         
         
           
-          <a href="../../02-authentication/" class="md-footer__link md-footer__link--next" aria-label="Next: Authentication &amp; Security">
+          <a href="../cashback/" class="md-footer__link md-footer__link--next" aria-label="Next: Cashback">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Authentication & Security
+                Cashback
               </div>
             </div>
             <div class="md-footer__button md-icon">

@@ -8,11 +8,15 @@ info:
 
     ## Authentication
 
-    Pass `merchant_mobile_no` and `store_password` in every request body. These credentials are
-    provisioned at merchant onboarding — contact **integrations@zicharge.com** to get started.
+    **Store credentials** — Pass `merchant_mobile_no` and `store_password` in the request body.
+    Required for Initiate Payment and Validate Payment.
 
-    > **Security note:** All API calls must be made server-side. Never expose `store_password` in
-    > client-side code, browser requests, or mobile apps.
+    **Bearer token (recommended for Cashback)** — Generate an API key via the Generate API Key
+    endpoint and pass it as `Authorization: Bearer <api_key>`. When present, body credentials are
+    not needed.
+
+    > **Security note:** All API calls must be made server-side. Never expose credentials or the
+    > API key in client-side code, browser requests, or mobile apps.
 
     ## Response format
 
@@ -22,10 +26,8 @@ info:
     | `code` | Meaning |
     |--------|---------|
     | `200`  | Success |
-    | `401`  | Authentication failure |
     | `404`  | Resource not found |
-    | `409`  | Duplicate `order_id` |
-    | `422`  | Validation failure |
+    | `422`  | Validation or business rule failure (includes bad credentials) |
 
     ## Environments
 
@@ -41,6 +43,8 @@ servers:
   - url: https://secure.zicharge.com
     description: "Production — live transactions"
 
+security: []
+
 tags:
   - name: Deposit
     description: |
@@ -51,7 +55,7 @@ tags:
     description: |
       Push credits from your merchant wallet to customer ZiCharge wallets.
 
-      **Flow:** Cashback → Validate Payment (optional)
+      **Flow:** Generate API Key (once) → Cashback (synchronous) → Validate Payment (optional)
 
 paths:
 
@@ -61,12 +65,12 @@ paths:
       operationId: initiatePayment
       summary: Initiate Payment
       description: |
-        Mint a payment token for a customer order. After a successful call, redirect the customer
-        to the `redirect_url` returned in the response. The hosted checkout page handles mobile
-        number entry and PIN verification.
+        Mint a single-use payment token and checkout URL for a customer order.
 
-        The token is valid for **15 minutes**. If a customer opens an expired token, the gateway
-        cancels it and fires a `Cancelled` IPN to your listener.
+        Redirect the customer to `payment_url` (web checkout) or display it as a QR code (in-store/kiosk).
+        The token expires after `expires_in_minutes` minutes.
+
+        Also available at the alias `/merchant/generate-qr-token`.
       requestBody:
         required: true
         content:
@@ -76,11 +80,12 @@ paths:
             example:
               merchant_mobile_no: "+9647712345678"
               store_password: "your-store-password"
-              order_id: "ORD-2026-000123"
-              bill_amount: 5000
-              success_url: "https://yoursite.com/orders/123/success"
-              cancel_url: "https://yoursite.com/orders/123/cancel"
-              ipn_url: "https://yoursite.com/webhooks/zicharge/ipn"
+              order_id: "ORD-2026-000001"
+              bill_amount: 1000
+              success_url: "https://yoursite.com/payment/success"
+              cancel_url: "https://yoursite.com/payment/cancel"
+              fail_url: "https://yoursite.com/payment/fail"
+              customer_mobile_no: "+9647701234567"
       responses:
         '200':
           description: Token minted — or error, check the `code` field
@@ -93,23 +98,28 @@ paths:
                   summary: Token minted
                   value:
                     code: 200
-                    messages: ["Token generated successfully."]
+                    messages: []
                     data:
-                      payment_token: "tok_a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4"
-                      redirect_url: "https://secure.zicharge.com/merchant/payment?token=tok_a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4"
-                      order_id: "ORD-2026-000123"
-                      expires_in_seconds: 900
-                duplicate_order:
-                  summary: Duplicate order_id
+                      token: "PMTKN7X2K9Q"
+                      payment_url: "https://dev.zicharge.com/merchant/payment?token=PMTKN7X2K9Q"
+                      expires_in_minutes: 15
+                invalid_credentials:
+                  summary: Invalid store credentials
                   value:
-                    code: 409
-                    messages: ["Order ID already exists."]
+                    code: 422
+                    messages: ["Invalid store credentials."]
                     data: null
-                auth_failure:
-                  summary: Invalid credentials
+                account_inactive:
+                  summary: Merchant account inactive
                   value:
-                    code: 401
-                    messages: ["Authentication failed."]
+                    code: 422
+                    messages: ["Account is inactive."]
+                    data: null
+                missing_fields:
+                  summary: Missing required field
+                  value:
+                    code: 422
+                    messages: ["merchant_mobile_no must not be blank", "bill_amount must not be null"]
                     data: null
 
   /merchant/payment/validation:
@@ -118,14 +128,16 @@ paths:
       operationId: validatePayment
       summary: Validate Payment
       description: |
-        Confirm the final status of a payment or cashback transaction by `order_id`.
-        Returns the canonical `transaction_id` to record in your books.
+        Confirm the status of a deposit or cashback transaction by `order_id`.
 
-        **When to call:**
-        - After receiving an IPN callback, to confirm and obtain `transaction_id`
-        - As a reconciliation fallback if your IPN listener missed both delivery attempts
+        For **deposit**: pass the `order_id` used in Initiate Payment.
+        For **cashback**: pass the `reference_id` used in Cashback as `order_id`.
+
+        Returns `tx_unique_id` — the canonical ZiCharge public reference. Record this in your books.
 
         This endpoint is **read-only** and safe to call multiple times.
+
+        Also available at the alias `/merchant/validate-payment`.
       requestBody:
         required: true
         content:
@@ -135,10 +147,10 @@ paths:
             example:
               merchant_mobile_no: "+9647712345678"
               store_password: "your-store-password"
-              order_id: "ORD-2026-000123"
+              order_id: "ORD-2026-000001"
       responses:
         '200':
-          description: Validation result — check `data.status` for the outcome
+          description: Validation result — check `code` and `data.status`
           content:
             application/json:
               schema:
@@ -148,11 +160,11 @@ paths:
                   summary: Payment confirmed
                   value:
                     code: 200
-                    messages: ["Successfully Deposited."]
+                    messages: ["Please find your transaction details."]
                     data:
-                      transaction_id: 123456
-                      order_id: "ORD-2026-000123"
-                      bill_amount: "5000"
+                      tx_unique_id: "CVIBAON916"
+                      order_id: "ORD-2026-000001"
+                      bill_amount: 1000
                       customer_account_no: "+9647701234567"
                       status: "Success"
                       received_at: "2026-05-20 10:00:00"
@@ -160,36 +172,118 @@ paths:
                   summary: Payment cancelled
                   value:
                     code: 200
-                    messages: ["Payment not completed."]
+                    messages: ["Please find your transaction details."]
                     data:
-                      order_id: "ORD-2026-000123"
+                      tx_unique_id: "CVIBAON916"
+                      order_id: "ORD-2026-000001"
+                      bill_amount: 1000
+                      customer_account_no: "+9647701234567"
                       status: "Cancelled"
+                      received_at: "2026-05-20 10:05:00"
+                not_found:
+                  summary: Transaction not found
+                  value:
+                    code: 404
+                    messages: ["Transaction not found."]
+                    data: null
+                invalid_credentials:
+                  summary: Invalid store credentials
+                  value:
+                    code: 422
+                    messages: ["Invalid store credentials."]
+                    data: null
 
-  /merchant/payment/cashback:
+  /api/v3/merchant/generate-api-key:
+    post:
+      tags: [Withdrawal]
+      operationId: generateApiKey
+      summary: Generate API Key
+      description: |
+        Generate (or regenerate) a merchant API key for authenticating Cashback requests.
+
+        The returned `api_key` is **shown only once** — store it immediately in your secrets manager.
+        Use it as `Authorization: Bearer <api_key>` on Cashback requests.
+
+        **Warning:** Regenerating immediately invalidates the previous key.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateApiKeyRequest'
+            example:
+              merchant_mobile_no: "+9647712345678"
+              store_password: "your-store-password"
+      responses:
+        '200':
+          description: API key generated — or error, check the `code` field
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenerateApiKeyResponse'
+              examples:
+                success:
+                  summary: API key generated
+                  value:
+                    code: 200
+                    messages: []
+                    data:
+                      api_key: "a3f8e2c1d5b94f7e2a1c8d3e6f9b0c4d7e2a1b5c8d3f6e9a0b4c7d2e5f8a1b4"
+                invalid_credentials:
+                  summary: Invalid store credentials
+                  value:
+                    code: 422
+                    messages: ["Invalid store credentials."]
+                    data: null
+
+  /api/v3/merchant/cash-back:
     post:
       tags: [Withdrawal]
       operationId: cashback
       summary: Cashback
       description: |
-        Push a credit from your merchant wallet directly to a customer's ZiCharge wallet.
+        Transfer funds from your merchant wallet to a customer's personal ZiCharge wallet.
         Settled **synchronously** — the customer's balance is updated in the same response.
 
-        Use for refunds, loyalty credits, and promotional disbursements. Minimum amount is 250 IQD.
+        Use for refunds, loyalty credits, and promotional disbursements.
 
-        The gateway performs an atomic balance check — a `code: 422` means no funds were moved.
+        ## Authentication
+
+        **Bearer token (recommended):** Pass `Authorization: Bearer <api_key>` in the header.
+        When present, `merchant_mobile_no` and `store_password` are not needed in the body.
+
+        **Store credentials (fallback):** Include `merchant_mobile_no` and `store_password` in the body.
+
+        ## Constraints
+
+        `receiver_mobile_no` must be a **personal** ZiCharge account — merchant or business accounts
+        are rejected. `reference_id` is your idempotency key; duplicate values are rejected.
+      security:
+        - BearerAuth: []
+        - {}
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/CashbackRequest'
-            example:
-              merchant_mobile_no: "+9647712345678"
-              store_password: "your-store-password"
-              customer_mobile_no: "+9647701234567"
-              amount: 1000
-              order_id: "CB-2026-000001"
-              remarks: "Refund for order ORD-2026-000123"
+            examples:
+              bearer_auth:
+                summary: Using Bearer token (recommended)
+                value:
+                  receiver_mobile_no: "+9647701234567"
+                  amount: 1000
+                  reference_id: "CB-2026-000001"
+                  lang: "en"
+              store_credentials:
+                summary: Using store credentials (fallback)
+                value:
+                  merchant_mobile_no: "+9647712345678"
+                  store_password: "your-store-password"
+                  receiver_mobile_no: "+9647701234567"
+                  amount: 1000
+                  reference_id: "CB-2026-000001"
+                  lang: "en"
       responses:
         '200':
           description: Cashback result — check `code` for the outcome
@@ -199,25 +293,55 @@ paths:
                 $ref: '#/components/schemas/CashbackResponse'
               examples:
                 success:
-                  summary: Credit applied
+                  summary: Cashback sent
                   value:
                     code: 200
-                    messages: ["Cashback sent successfully."]
+                    messages: ["The money has been sent."]
                     data:
-                      transaction_id: 789012
-                      order_id: "CB-2026-000001"
-                      amount: "1000"
-                      customer_mobile_no: "+9647701234567"
+                      tx_unique_id: "CVIBAON916"
+                      reference_id: "CB-2026-000001"
+                      amount: 1000
+                      customer_account_no: "+9647701234567"
                       status: "Success"
-                      received_at: "2026-05-20 10:05:00"
+                      sent_at: "2026-05-20 18:39:25"
+                invalid_credentials:
+                  summary: Invalid store credentials
+                  value:
+                    code: 422
+                    messages: ["Invalid store credentials."]
+                    data: null
                 insufficient_balance:
                   summary: Insufficient merchant balance
                   value:
                     code: 422
-                    messages: ["Insufficient merchant balance."]
+                    messages: ["Insufficient account balance."]
+                    data: null
+                not_personal_account:
+                  summary: Receiver is not a personal account
+                  value:
+                    code: 422
+                    messages: ["Invalid customer account. Only personal accounts can receive cashback."]
+                    data: null
+                duplicate_reference:
+                  summary: Duplicate reference_id
+                  value:
+                    code: 422
+                    messages: ["Duplicate payment detected for the given reference ID."]
+                    data: null
+                limit_exceeded:
+                  summary: Transaction limit exceeded
+                  value:
+                    code: 422
+                    messages: ["Transaction amount exceeds the allowed limit."]
                     data: null
 
 components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: "Merchant API key — generate via POST /api/v3/merchant/generate-api-key"
+
   schemas:
 
     GenerateTokenRequest:
@@ -235,56 +359,57 @@ components:
         order_id:
           type: string
           description: Your unique order identifier. The same order_id will not create a duplicate charge.
-          example: "ORD-2026-000123"
+          example: "ORD-2026-000001"
         bill_amount:
           type: number
-          description: Amount in IQD. Minimum 250. Validated with BigDecimal precision.
-          example: 5000
+          description: Amount in IQD. Minimum 250.
+          example: 1000
           minimum: 250
         success_url:
           type: string
           description: URL the customer is redirected to after successful payment
-          example: "https://yoursite.com/orders/123/success"
+          example: "https://yoursite.com/payment/success"
         cancel_url:
           type: string
           description: URL the customer is redirected to after cancellation
-          example: "https://yoursite.com/orders/123/cancel"
-        ipn_url:
+          example: "https://yoursite.com/payment/cancel"
+        fail_url:
           type: string
-          description: Your IPN listener endpoint (HTTPS only). Overrides the dashboard setting.
-          example: "https://yoursite.com/webhooks/zicharge/ipn"
+          description: URL the customer is redirected to after a failed payment attempt
+          example: "https://yoursite.com/payment/fail"
+        customer_mobile_no:
+          type: string
+          description: Pre-fill the customer's wallet number on the checkout page (optional)
+          example: "+9647701234567"
 
     GenerateTokenResponse:
       type: object
       properties:
         code:
           type: integer
-          description: "200 = success | 401 = auth failure | 409 = duplicate order_id | 422 = validation error"
+          description: "200 = success | 422 = validation or credential failure"
           example: 200
         messages:
           type: array
           items:
             type: string
-          example: ["Token generated successfully."]
+          example: []
         data:
           type: object
           nullable: true
           properties:
-            payment_token:
+            token:
               type: string
-              description: Opaque token bound to this order. Valid for 15 minutes.
-              example: "tok_a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4"
-            redirect_url:
+              description: Single-use payment token. Valid for expires_in_minutes minutes.
+              example: "PMTKN7X2K9Q"
+            payment_url:
               type: string
-              description: Hosted checkout URL — redirect the customer here immediately
-              example: "https://secure.zicharge.com/merchant/payment?token=tok_a1b2c3d4..."
-            order_id:
-              type: string
-              example: "ORD-2026-000123"
-            expires_in_seconds:
+              description: Hosted checkout URL — redirect the customer here, or render as QR code
+              example: "https://dev.zicharge.com/merchant/payment?token=PMTKN7X2K9Q"
+            expires_in_minutes:
               type: integer
-              description: Seconds until the token expires (900 = 15 minutes)
-              example: 900
+              description: Minutes until the token expires
+              example: 15
 
     ValidationRequest:
       type: object
@@ -298,8 +423,8 @@ components:
           example: "your-store-password"
         order_id:
           type: string
-          description: The order_id submitted when initiating the payment or cashback
-          example: "ORD-2026-000123"
+          description: For deposit — the order_id from Initiate Payment. For cashback — the reference_id from Cashback.
+          example: "ORD-2026-000001"
 
     ValidationResponse:
       type: object
@@ -311,21 +436,21 @@ components:
           type: array
           items:
             type: string
-          example: ["Successfully Deposited."]
+          example: ["Please find your transaction details."]
         data:
           type: object
           nullable: true
           properties:
-            transaction_id:
-              type: integer
-              description: Canonical ZiCharge transaction ID — use this in your ledger
-              example: 123456
+            tx_unique_id:
+              type: string
+              description: Public transaction reference — use this in your ledger and for support queries
+              example: "CVIBAON916"
             order_id:
               type: string
-              example: "ORD-2026-000123"
+              example: "ORD-2026-000001"
             bill_amount:
-              type: string
-              example: "5000"
+              type: integer
+              example: 1000
             customer_account_no:
               type: string
               example: "+9647701234567"
@@ -335,69 +460,106 @@ components:
               example: "Success"
             received_at:
               type: string
-              description: UTC timestamp
+              description: UTC timestamp (yyyy-MM-dd HH:mm:ss)
               example: "2026-05-20 10:00:00"
 
-    CashbackRequest:
+    GenerateApiKeyRequest:
       type: object
-      required: [merchant_mobile_no, store_password, customer_mobile_no, amount, order_id]
+      required: [merchant_mobile_no, store_password]
       properties:
         merchant_mobile_no:
           type: string
+          description: Your merchant wallet number in E.164 format
           example: "+9647712345678"
         store_password:
           type: string
+          description: Your store password
           example: "your-store-password"
-        customer_mobile_no:
+
+    GenerateApiKeyResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 200
+        messages:
+          type: array
+          items:
+            type: string
+          example: []
+        data:
+          type: object
+          nullable: true
+          properties:
+            api_key:
+              type: string
+              description: "Merchant API key — shown once. Use as: Authorization: Bearer <api_key>"
+              example: "a3f8e2c1d5b94f7e2a1c8d3e6f9b0c4d7e2a1b5c8d3f6e9a0b4c7d2e5f8a1b4"
+
+    CashbackRequest:
+      type: object
+      required: [receiver_mobile_no, amount]
+      properties:
+        receiver_mobile_no:
           type: string
-          description: Recipient's ZiCharge wallet number in E.164 format
+          description: Recipient's personal ZiCharge wallet number in E.164 format. Must be a personal account.
           example: "+9647701234567"
         amount:
           type: number
-          description: Amount in IQD to credit. Minimum 250.
+          description: Amount in IQD to credit
           example: 1000
-          minimum: 250
-        order_id:
+          minimum: 1
+        reference_id:
           type: string
-          description: Your unique reference for this cashback — used for idempotency
+          description: Your unique reference for this cashback. Used as idempotency key — duplicate values are rejected.
           example: "CB-2026-000001"
-        remarks:
+        lang:
           type: string
-          description: Optional free-text note attached to the transaction
-          example: "Refund for order ORD-2026-000123"
+          description: Response language — en, ar, or ku
+          enum: [en, ar, ku]
+          example: "en"
+        merchant_mobile_no:
+          type: string
+          description: Required when not using Bearer token auth.
+          example: "+9647712345678"
+        store_password:
+          type: string
+          description: Required when not using Bearer token auth. Never expose client-side.
+          example: "your-store-password"
 
     CashbackResponse:
       type: object
       properties:
         code:
           type: integer
-          description: "200 = success | 401 = auth failure | 404 = customer not found | 409 = duplicate order_id | 422 = validation error or insufficient balance"
+          description: "200 = success | 422 = validation, credential, or business rule failure"
           example: 200
         messages:
           type: array
           items:
             type: string
-          example: ["Cashback sent successfully."]
+          example: ["The money has been sent."]
         data:
           type: object
           nullable: true
           properties:
-            transaction_id:
-              type: integer
-              description: Canonical ZiCharge transaction ID — use this in your ledger
-              example: 789012
-            order_id:
+            tx_unique_id:
+              type: string
+              description: Public transaction reference — use this in your ledger
+              example: "CVIBAON916"
+            reference_id:
               type: string
               example: "CB-2026-000001"
             amount:
-              type: string
-              example: "1000"
-            customer_mobile_no:
+              type: integer
+              example: 1000
+            customer_account_no:
               type: string
               example: "+9647701234567"
             status:
               type: string
               example: "Success"
-            received_at:
+            sent_at:
               type: string
-              example: "2026-05-20 10:05:00"
+              description: UTC timestamp (yyyy-MM-dd HH:mm:ss)
+              example: "2026-05-20 18:39:25"

@@ -2,9 +2,9 @@
 template: home.html
 ---
 
-<div class="zi-section-label">Integration Flows</div>
+## Integration Flows
 
-<div class="zi-diagram-tabs-wrap">
+<p class="zi-section-intro">Your backend mints a token or pushes a credit — ZiCharge handles the hosted checkout, wallet debit, and real-time confirmation.</p>
 
 === "Online Payment (Deposit)"
 
@@ -18,17 +18,17 @@ template: home.html
         participant C as Customer
 
         M->>G: POST /merchant/generate-payment-token
-        G-->>M: payment_token + redirect_url
+        G-->>M: token + payment_url
         M->>C: Redirect customer to hosted checkout
 
         C->>G: Enter mobile number and PIN
         G-->>C: Payment confirmed
 
-        G->>M: POST ipn_url - IPN notification
+        G->>M: POST ipn_url — IPN notification
         M-->>G: HTTP 200 acknowledge
 
         M->>G: POST /merchant/payment/validation
-        G-->>M: transaction_id confirmed
+        G-->>M: tx_unique_id + status confirmed
     ```
 
 === "Cashback (Withdrawal)"
@@ -42,20 +42,18 @@ template: home.html
         participant G as ZiCharge Gateway
         participant W as Customer Wallet
 
-        M->>G: POST /merchant/payment/cashback
+        M->>G: POST /api/v3/merchant/cash-back
         G->>W: Credit amount applied to wallet
-        G-->>M: transaction_id + Success
+        G-->>M: tx_unique_id + Success
 
-        note over M,G: Optional - fetch full transaction record
+        note over M,G: Optional — verify the transaction record
         M->>G: POST /merchant/payment/validation
-        G-->>M: transaction_id, amount, received_at
+        G-->>M: tx_unique_id, amount, received_at
     ```
-
-</div>
 
 ---
 
-<div class="zi-section-label">API Reference</div>
+## API Reference
 
 <div class="zi-api-section" markdown>
 
@@ -113,6 +111,14 @@ Confirm the final payment status and obtain the canonical transaction ID.
 <div class="zi-api-item" markdown>
 <span class="zi-method zi-method--post">POST</span>
 <div class="zi-api-item-body" markdown>
+**[Generate API Key](withdrawal/generate-api-key.md)**
+Issue a merchant API key for Bearer token authentication on Cashback requests.
+</div>
+</div>
+
+<div class="zi-api-item" markdown>
+<span class="zi-method zi-method--post">POST</span>
+<div class="zi-api-item-body" markdown>
 **[Cashback](withdrawal/cashback.md)**
 Credit a customer wallet synchronously — for refunds, rewards, and promotions.
 </div>
@@ -133,7 +139,7 @@ Fetch the full transaction record for a completed cashback.
 
 ---
 
-<div class="zi-section-label">Try the API</div>
+## API Explorer
 
 <div class="zi-explorer-cta" markdown>
 
@@ -148,7 +154,7 @@ Browse every endpoint, inspect request and response schemas, and run live calls 
 </div>
 
 <div class="zi-explorer-meta" markdown>
-Covers 3 live endpoints · Sandbox & Production servers · Inline request builder · Example responses
+Covers 4 live endpoints · Sandbox & Production servers · Inline request builder · Example responses
 </div>
 </div>
 
@@ -163,7 +169,8 @@ Covers 3 live endpoints · Sandbox & Production servers · Inline request builde
 <div class="zi-mock-explorer-body">
   <div class="zi-mock-row"><span class="zi-mock-tag zi-mock-tag--post">POST</span><span class="zi-mock-path">/merchant/generate-payment-token</span></div>
   <div class="zi-mock-row"><span class="zi-mock-tag zi-mock-tag--post">POST</span><span class="zi-mock-path">/merchant/payment/validation</span></div>
-  <div class="zi-mock-row"><span class="zi-mock-tag zi-mock-tag--post">POST</span><span class="zi-mock-path">/merchant/payment/cashback</span></div>
+  <div class="zi-mock-row"><span class="zi-mock-tag zi-mock-tag--post">POST</span><span class="zi-mock-path">/api/v3/merchant/generate-api-key</span></div>
+  <div class="zi-mock-row"><span class="zi-mock-tag zi-mock-tag--post">POST</span><span class="zi-mock-path">/api/v3/merchant/cash-back</span></div>
 </div>
 </div>
 </div>
@@ -172,7 +179,7 @@ Covers 3 live endpoints · Sandbox & Production servers · Inline request builde
 
 ---
 
-<div class="zi-section-label">Environments</div>
+## Environments
 
 <div class="zi-env-grid" markdown>
 
@@ -202,7 +209,7 @@ Live transaction environment. TLS 1.2+ enforced.
 
 ---
 
-<div class="zi-merchant-section" id="become-a-merchant">
+<div class="zi-merchant-section" id="become-a-merchant" markdown>
 
 ## Become a Merchant
 
@@ -229,7 +236,7 @@ Interested in integrating ZiCharge payments into your platform? Fill in your det
       <input class="zi-form-input" type="text" id="contact-name" placeholder="Full name" required>
     </div>
   </div>
-  <div class="zi-form-row">
+  <div class="zi-form-row zi-form-row--full">
     <div class="zi-form-group">
       <label class="zi-form-label" for="contact-email">Contact Email <span class="zi-required">*</span></label>
       <input class="zi-form-input" type="email" id="contact-email" placeholder="you@yoursite.com" required>

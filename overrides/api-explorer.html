@@ -1,35 +1,35 @@
 {% extends "main.html" %}
 
-{# ZiCharge API Explorer — Scalar with CORS proxy, flex-chain full-bleed layout #}
+{# ZiCharge API Explorer — Scalar with CORS proxy, full-bleed layout #}
 {% block styles %}
 {{ super() }}
 <style>
-  /* ── Flex chain: stretch every ancestor from html down to our
-     explorer so it fills exactly the space below MkDocs header+tabs
-     without any hardcoded pixel offsets or position:fixed tricks.
-     overflow:hidden on each level prevents page-level scrollbars.  ── */
+  /*
+   * Scope all overrides to the explorer page only by targeting
+   * .zi-explorer-active on <body>, which we add via JS below.
+   * This prevents these aggressive overrides from leaking to other pages.
+   */
 
-  html, body {
-    height: 100% !important;
+  /* ── Make the viewport fill the full height below the sticky header ── */
+  body.zi-explorer-active {
     overflow: hidden !important;
   }
-  /* MkDocs container sits below the sticky header+tabs */
-  .md-container {
+  body.zi-explorer-active .md-container {
     display: flex !important;
     flex-direction: column !important;
-    height: 100% !important;
+    /* Subtract the header height (48px) and tabs height (48px) */
+    height: calc(100vh - 48px) !important;
     overflow: hidden !important;
   }
-  .md-main {
+  body.zi-explorer-active .md-main {
     flex: 1 1 0 !important;
     display: flex !important;
     flex-direction: column !important;
     padding-top: 0 !important;
     overflow: hidden !important;
+    min-height: 0 !important;
   }
-  /* md-main__inner also carries the md-grid class (max-width: 61rem).
-     We override both max-width and the grid gap so content is full-width. */
-  .md-main__inner {
+  body.zi-explorer-active .md-main__inner {
     flex: 1 1 0 !important;
     display: flex !important;
     flex-direction: column !important;
@@ -37,8 +37,9 @@
     padding: 0 !important;
     max-width: 100% !important;
     overflow: hidden !important;
+    min-height: 0 !important;
   }
-  .md-content {
+  body.zi-explorer-active .md-content {
     flex: 1 1 0 !important;
     display: flex !important;
     flex-direction: column !important;
@@ -47,10 +48,9 @@
     max-width: 100% !important;
     width: 100% !important;
     overflow: hidden !important;
+    min-height: 0 !important;
   }
-  /* md-content__inner is the <article> Material renders;
-     it has padding: 1.2rem 0.8rem 6rem and max-width: 61rem by default */
-  .md-content__inner {
+  body.zi-explorer-active .md-content__inner {
     flex: 1 1 0 !important;
     display: flex !important;
     flex-direction: column !important;
@@ -58,18 +58,24 @@
     padding: 0 !important;
     max-width: none !important;
     overflow: hidden !important;
+    min-height: 0 !important;
+  }
+  /* Hide the default h1 page title MkDocs inserts */
+  body.zi-explorer-active .md-content__inner > h1:first-child {
+    display: none !important;
   }
 
-  /* ── Explorer shell fills everything left after header+tabs ── */
+  /* ── Explorer shell ─────────────────────────────────────── */
   .zi-explorer-page {
     flex: 1 1 0;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     width: 100%;
+    min-height: 0;
   }
 
-  /* ── Top bar ──────────────────────────────────────────── */
+  /* ── Top bar ─────────────────────────────────────────────── */
   .zi-explorer-topbar {
     display: flex;
     align-items: center;
@@ -149,7 +155,7 @@
     margin: 0 0.15rem;
   }
 
-  /* ── Action buttons ───────────────────────────────────── */
+  /* ── Action buttons ─────────────────────────────────────── */
   .zi-topbar-actions {
     display: flex;
     align-items: center;
@@ -184,26 +190,31 @@
   .zi-topbar-btn--ghost:hover { background: rgba(255,255,255,0.13); color: #fff !important; }
   .zi-topbar-btn-icon { width: 13px; height: 13px; flex-shrink: 0; }
 
-  /* ── Scalar container — fills all remaining height/width ─ */
+  /* ── Scalar container ───────────────────────────────────── */
   #zi-scalar-root {
     flex: 1 1 0;
     min-height: 0;
     width: 100%;
-    overflow: hidden;
+    /*
+     * Use overflow: auto (NOT hidden) so Scalar's own internal scroll works.
+     * overflow: hidden was clipping Scalar's sticky sidebar and panel headers.
+     */
+    overflow: auto;
     position: relative;
     background: #f8fafc;
     /*
-      transform creates a new CSS "containing block" for position:fixed
-      descendants (per CSS spec §9.3). Without this, Scalar's internal
-      fixed header anchors to the viewport top and covers our topbar.
-      With this, Scalar's fixed elements anchor to #zi-scalar-root instead.
-    */
-    transform: translateZ(0);
+     * Do NOT use transform: translateZ(0) here.
+     * That trick creates a new containing block which breaks Scalar's
+     * internal position:fixed dropdowns and modals — they anchor to this
+     * div instead of the viewport and end up in the wrong place.
+     */
   }
-  /* Scalar mounts a single div after the #api-reference script */
-  #zi-scalar-root > div {
+  #zi-scalar-root > div,
+  #zi-scalar-root .scalar-app,
+  #zi-scalar-root .scalar-container {
     width: 100% !important;
     height: 100% !important;
+    min-height: 100% !important;
   }
 </style>
 {% endblock %}
@@ -223,7 +234,6 @@
         Live testing
       </span>
       <span class="zi-pill zi-pill--proxy">
-        <!-- Globe icon -->
         <svg class="zi-pill__icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"/>
           <path d="M2 8h12M8 2c-1.5 2-2 4-2 6s.5 4 2 6M8 2c1.5 2 2 4 2 6s-.5 4-2 6" stroke="currentColor" stroke-width="1.1"/>
@@ -264,113 +274,119 @@
     </div>
   </div>
 
-  <!-- ── Scalar API Reference (live, CORS-proxied) ─────── -->
+  <!-- ── Scalar API Reference ──────────────────────────────── -->
   <div id="zi-scalar-root">
     <!--
-      Scalar mounts immediately after this script tag inside #zi-scalar-root.
-      proxyUrl enables real API calls from the browser by routing through proxy.scalar.com.
+      IMPORTANT: data-configuration must be set on this script tag BEFORE
+      the Scalar CDN script loads. We inline the config here as JSON.
+      Setting it imperatively via JS after the CDN loads is too late —
+      Scalar reads the attribute during its own DOMContentLoaded handler.
     -->
     <script
       id="api-reference"
       data-url="/zc-paymentgw-developer-docs/assets/openapi.yaml"
+      data-configuration='{"url":"/zc-paymentgw-developer-docs/assets/openapi.yaml","proxyUrl":"https://proxy.scalar.com","theme":"default","layout":"modern","darkMode":false,"hideDarkModeToggle":false,"showSidebar":true,"hideModels":false,"hideDownloadButton":false,"defaultHttpClient":{"targetKey":"shell","clientKey":"curl"},"authentication":{"preferredSecurityScheme":"BearerAuth","http":{"bearer":{"token":""}}}}'
     ></script>
   </div>
 
 </div>
 
-<!-- Scalar configuration — set before loading the library -->
-<script>
-  document.getElementById('api-reference').dataset.configuration = JSON.stringify({
-    /* ── Spec source ─────────────────────────────────── */
-    url: '/zc-paymentgw-developer-docs/assets/openapi.yaml',
-
-    /* ── CORS proxy — enables live browser testing ───── */
-    proxyUrl: 'https://proxy.scalar.com',
-
-    /* ── Layout & theme ──────────────────────────────── */
-    theme: 'default',
-    layout: 'modern',
-    darkMode: false,
-    hideDarkModeToggle: false,
-    showSidebar: true,
-    hideModels: false,
-    hideDownloadButton: false,
-
-    /* ── Default code example language ──────────────── */
-    defaultHttpClient: {
-      targetKey: 'shell',
-      clientKey: 'curl'
-    },
-
-    /* ── Pre-select Bearer auth scheme ──────────────── */
-    authentication: {
-      preferredSecurityScheme: 'BearerAuth',
-      http: {
-        bearer: {
-          token: ''
-        }
-      }
-    },
-
-    /* ── Brand CSS injected into Scalar component ───── */
-    customCss: `
-      /* ── Accent and base palette ─────────────────── */
-      :root {
-        --scalar-color-accent:    #00b386;
-        --scalar-background-1:    #f8fafc;
-        --scalar-background-2:    #ffffff;
-        --scalar-background-3:    #f1f5f9;
-        --scalar-color-1:         #0a1628;
-        --scalar-color-2:         #3d5068;
-        --scalar-color-3:         #8097ae;
-        --scalar-border-color:    #e2e8f0;
-        --scalar-font:            'Inter', system-ui, sans-serif;
-        --scalar-font-code:       'JetBrains Mono', ui-monospace, monospace;
-      }
-
-      /* ── Sidebar — ZiCharge dark blue ─────────────── */
-      :root {
-        --scalar-sidebar-background-1:        #0d1e3a;
-        --scalar-sidebar-color-1:             rgba(255,255,255,0.82);
-        --scalar-sidebar-color-2:             rgba(255,255,255,0.45);
-        --scalar-sidebar-color-active:        #ffffff;
-        --scalar-sidebar-color-accent:        #00b386;
-        --scalar-sidebar-border-color:        rgba(255,255,255,0.08);
-        --scalar-sidebar-search-background:   rgba(255,255,255,0.07);
-        --scalar-sidebar-search-border-color: rgba(255,255,255,0.12);
-        --scalar-sidebar-search-color:        rgba(255,255,255,0.65);
-      }
-
-      /* ── HTTP method badge colours ────────────────── */
-      .post-method   { --scalar-color-accent: #059669 !important; }
-      .get-method    { --scalar-color-accent: #1b6ca8 !important; }
-      .delete-method { --scalar-color-accent: #dc2626 !important; }
-      .put-method    { --scalar-color-accent: #d97706 !important; }
-      .patch-method  { --scalar-color-accent: #7c3aed !important; }
-
-      /* ── Send button ──────────────────────────────── */
-      button[data-testid="send-request-button"],
-      button.send-request {
-        background: #00b386 !important;
-        border-color: #009972 !important;
-      }
-      button[data-testid="send-request-button"]:hover,
-      button.send-request:hover {
-        background: #009972 !important;
-      }
-    `
-  })
-</script>
-
 <!--
-  Scalar API Reference CDN.
-  Pin format: @1 tracks latest stable 1.x; bump to @2 only after verifying breaking changes.
-  If a specific version is needed, use e.g. @1.25.0 and test before deploying.
+  Scalar CDN — loaded AFTER the #api-reference script tag so it finds
+  the configured element immediately on init.
+  @1 tracks latest stable 1.x.
 -->
 <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference@1"
         crossorigin="anonymous"></script>
+
+<!--
+  Apply the zi-explorer-active class to <body> so our scoped CSS
+  overrides activate only on this page.
+  Also inject Scalar's brand CSS after it mounts (via MutationObserver
+  targeting the shadow root or the scalar-app element).
+-->
+<script>
+(function () {
+  /* 1. Scope body class so CSS overrides only apply on this page */
+  document.body.classList.add('zi-explorer-active');
+
+  /* 2. Remove the class when navigating away (MkDocs instant loading) */
+  document.addEventListener('DOMContentSwapped', function () {
+    document.body.classList.remove('zi-explorer-active');
+  });
+
+  /*
+   * 3. Inject brand CSS into Scalar's shadow DOM (if it uses one)
+   *    or directly into the document if Scalar renders in light DOM.
+   *    We wait for Scalar to mount its root element, then inject.
+   */
+  var brandCss = [
+    ':root {',
+    '  --scalar-color-accent:    #00b386;',
+    '  --scalar-background-1:    #f8fafc;',
+    '  --scalar-background-2:    #ffffff;',
+    '  --scalar-background-3:    #f1f5f9;',
+    '  --scalar-color-1:         #0a1628;',
+    '  --scalar-color-2:         #3d5068;',
+    '  --scalar-color-3:         #8097ae;',
+    '  --scalar-border-color:    #e2e8f0;',
+    '  --scalar-font:            "Inter", system-ui, sans-serif;',
+    '  --scalar-font-code:       "JetBrains Mono", ui-monospace, monospace;',
+    '  --scalar-sidebar-background-1:        #0d1e3a;',
+    '  --scalar-sidebar-color-1:             rgba(255,255,255,0.82);',
+    '  --scalar-sidebar-color-2:             rgba(255,255,255,0.45);',
+    '  --scalar-sidebar-color-active:        #ffffff;',
+    '  --scalar-sidebar-color-accent:        #00b386;',
+    '  --scalar-sidebar-border-color:        rgba(255,255,255,0.08);',
+    '  --scalar-sidebar-search-background:   rgba(255,255,255,0.07);',
+    '  --scalar-sidebar-search-border-color: rgba(255,255,255,0.12);',
+    '  --scalar-sidebar-search-color:        rgba(255,255,255,0.65);',
+    '}',
+    '.post-method   { --scalar-color-accent: #059669 !important; }',
+    '.get-method    { --scalar-color-accent: #1b6ca8 !important; }',
+    '.delete-method { --scalar-color-accent: #dc2626 !important; }',
+    '.put-method    { --scalar-color-accent: #d97706 !important; }',
+    '.patch-method  { --scalar-color-accent: #7c3aed !important; }',
+    'button[data-testid="send-request-button"], button.send-request {',
+    '  background: #00b386 !important; border-color: #009972 !important;',
+    '}',
+    'button[data-testid="send-request-button"]:hover, button.send-request:hover {',
+    '  background: #009972 !important;',
+    '}'
+  ].join('\n');
+
+  function injectBrandCss(root) {
+    var style = document.createElement('style');
+    style.textContent = brandCss;
+    (root || document.head).appendChild(style);
+  }
+
+  /* Try shadow DOM first, fall back to document head */
+  var observer = new MutationObserver(function (mutations, obs) {
+    var scalarRoot = document.querySelector('#zi-scalar-root .scalar-app, #zi-scalar-root [class*="scalar"]');
+    if (scalarRoot) {
+      obs.disconnect();
+      if (scalarRoot.shadowRoot) {
+        injectBrandCss(scalarRoot.shadowRoot);
+      } else {
+        injectBrandCss(document.head);
+      }
+    }
+  });
+  observer.observe(document.getElementById('zi-scalar-root'), { childList: true, subtree: true });
+
+  /* Fallback: inject to head after 2s if observer never fires */
+  setTimeout(function () {
+    observer.disconnect();
+    if (!document.querySelector('style[data-zi-brand]')) {
+      injectBrandCss(document.head);
+    }
+  }, 2000);
+})();
+</script>
 
 {% endblock %}
 
 {% block sidebar %}{% endblock %}
 {% block toc %}{% endblock %}
+{% block footer %}{% endblock %}

@@ -518,9 +518,9 @@
               }
             },
             "url": {
-              "raw": "{{base_url}}/api/v3/merchant/cash-back",
+              "raw": "{{base_url}}/api/v2/merchant/cash-back",
               "host": ["{{base_url}}"],
-              "path": ["api", "v3", "merchant", "cash-back"]
+              "path": ["api", "v2", "merchant", "cash-back"]
             },
             "description": "Transfer funds from your merchant wallet to a customer personal wallet as cashback or refund. Settled synchronously — the customer's balance is updated in the same response."
           },
@@ -539,9 +539,9 @@
                   "options": {"raw": {"language": "json"}}
                 },
                 "url": {
-                  "raw": "{{base_url}}/api/v3/merchant/cash-back",
+                  "raw": "{{base_url}}/api/v2/merchant/cash-back",
                   "host": ["{{base_url}}"],
-                  "path": ["api", "v3", "merchant", "cash-back"]
+                  "path": ["api", "v2", "merchant", "cash-back"]
                 }
               },
               "status": "OK",
@@ -565,9 +565,9 @@
                   "options": {"raw": {"language": "json"}}
                 },
                 "url": {
-                  "raw": "{{base_url}}/api/v3/merchant/cash-back",
+                  "raw": "{{base_url}}/api/v2/merchant/cash-back",
                   "host": ["{{base_url}}"],
-                  "path": ["api", "v3", "merchant", "cash-back"]
+                  "path": ["api", "v2", "merchant", "cash-back"]
                 }
               },
               "status": "OK",
@@ -591,9 +591,9 @@
                   "options": {"raw": {"language": "json"}}
                 },
                 "url": {
-                  "raw": "{{base_url}}/api/v3/merchant/cash-back",
+                  "raw": "{{base_url}}/api/v2/merchant/cash-back",
                   "host": ["{{base_url}}"],
-                  "path": ["api", "v3", "merchant", "cash-back"]
+                  "path": ["api", "v2", "merchant", "cash-back"]
                 }
               },
               "status": "OK",
@@ -617,9 +617,9 @@
                   "options": {"raw": {"language": "json"}}
                 },
                 "url": {
-                  "raw": "{{base_url}}/api/v3/merchant/cash-back",
+                  "raw": "{{base_url}}/api/v2/merchant/cash-back",
                   "host": ["{{base_url}}"],
-                  "path": ["api", "v3", "merchant", "cash-back"]
+                  "path": ["api", "v2", "merchant", "cash-back"]
                 }
               },
               "status": "OK",
@@ -643,9 +643,9 @@
                   "options": {"raw": {"language": "json"}}
                 },
                 "url": {
-                  "raw": "{{base_url}}/api/v3/merchant/cash-back",
+                  "raw": "{{base_url}}/api/v2/merchant/cash-back",
                   "host": ["{{base_url}}"],
-                  "path": ["api", "v3", "merchant", "cash-back"]
+                  "path": ["api", "v2", "merchant", "cash-back"]
                 }
               },
               "status": "OK",
@@ -669,9 +669,9 @@
                   "options": {"raw": {"language": "json"}}
                 },
                 "url": {
-                  "raw": "{{base_url}}/api/v3/merchant/cash-back",
+                  "raw": "{{base_url}}/api/v2/merchant/cash-back",
                   "host": ["{{base_url}}"],
-                  "path": ["api", "v3", "merchant", "cash-back"]
+                  "path": ["api", "v2", "merchant", "cash-back"]
                 }
               },
               "status": "OK",

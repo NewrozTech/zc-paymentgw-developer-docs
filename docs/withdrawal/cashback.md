@@ -9,7 +9,7 @@ Use for refunds, loyalty credits, and promotional disbursements.
 ## Endpoint
 
 ```
-POST /api/v3/merchant/cash-back
+POST /api/v2/merchant/cash-back
 ```
 
 | Environment | Base URL |
@@ -54,7 +54,7 @@ Use this if you haven't yet generated an API key.
 === "cURL — Bearer Token"
 
     ```bash
-    curl -X POST https://secure.zicharge.com/api/v3/merchant/cash-back \
+    curl -X POST https://secure.zicharge.com/api/v2/merchant/cash-back \
       -H "Content-Type: application/json" \
       -H "Accept: application/json" \
       -H "Authorization: Bearer your-api-key" \
@@ -69,7 +69,7 @@ Use this if you haven't yet generated an API key.
 === "cURL — Store Credentials"
 
     ```bash
-    curl -X POST https://secure.zicharge.com/api/v3/merchant/cash-back \
+    curl -X POST https://secure.zicharge.com/api/v2/merchant/cash-back \
       -H "Content-Type: application/json" \
       -H "Accept: application/json" \
       -d '{
@@ -98,7 +98,7 @@ Use this if you haven't yet generated an API key.
         """;
 
     HttpRequest request = HttpRequest.newBuilder()
-        .uri(URI.create("https://secure.zicharge.com/api/v3/merchant/cash-back"))
+        .uri(URI.create("https://secure.zicharge.com/api/v2/merchant/cash-back"))
         .header("Content-Type", "application/json")
         .header("Accept", "application/json")
         .header("Authorization", "Bearer " + API_KEY)
@@ -119,7 +119,7 @@ Use this if you haven't yet generated an API key.
         'lang'               => 'en',
     ];
 
-    $ch = curl_init('https://secure.zicharge.com/api/v3/merchant/cash-back');
+    $ch = curl_init('https://secure.zicharge.com/api/v2/merchant/cash-back');
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
@@ -138,7 +138,7 @@ Use this if you haven't yet generated an API key.
     ```javascript
     // Bearer token auth — credentials not needed in body
     const response = await fetch(
-      'https://secure.zicharge.com/api/v3/merchant/cash-back',
+      'https://secure.zicharge.com/api/v2/merchant/cash-back',
       {
         method: 'POST',
         headers: {

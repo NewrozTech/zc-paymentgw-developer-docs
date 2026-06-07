@@ -236,7 +236,7 @@ paths:
                     messages: ["Invalid store credentials."]
                     data: null
 
-  /api/v3/merchant/cash-back:
+  /api/v2/merchant/cash-back:
     post:
       tags: [Withdrawal]
       operationId: cashback

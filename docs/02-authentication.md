@@ -90,7 +90,7 @@ When this header is present, `merchant_mobile_no` and `store_password` are **not
 | `POST /merchant/generate-qr-token` | Required | Required | — |
 | `POST /merchant/payment/validation` | Required | Required | — |
 | `POST /api/v3/merchant/generate-api-key` | Required | Required | — |
-| `POST /api/v3/merchant/cash-back` | Conditional | Conditional | Preferred — replaces body credentials |
+| `POST /api/v2/merchant/cash-back` | Conditional | Conditional | Preferred — replaces body credentials |
 
 ---
 

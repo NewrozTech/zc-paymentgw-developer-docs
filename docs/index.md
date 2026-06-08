@@ -42,7 +42,7 @@ template: home.html
         participant G as ZiCharge Gateway
         participant W as Customer Wallet
 
-        M->>G: POST /api/v3/merchant/cash-back
+        M->>G: POST /api/v2/merchant/cash-back
         G->>W: Credit amount applied to wallet
         G-->>M: tx_unique_id + Success
 
@@ -170,7 +170,7 @@ Covers 4 live endpoints · Sandbox & Production servers · Inline request builde
   <div class="zi-mock-row"><span class="zi-mock-tag zi-mock-tag--post">POST</span><span class="zi-mock-path">/merchant/generate-payment-token</span></div>
   <div class="zi-mock-row"><span class="zi-mock-tag zi-mock-tag--post">POST</span><span class="zi-mock-path">/merchant/payment/validation</span></div>
   <div class="zi-mock-row"><span class="zi-mock-tag zi-mock-tag--post">POST</span><span class="zi-mock-path">/api/v3/merchant/generate-api-key</span></div>
-  <div class="zi-mock-row"><span class="zi-mock-tag zi-mock-tag--post">POST</span><span class="zi-mock-path">/api/v3/merchant/cash-back</span></div>
+  <div class="zi-mock-row"><span class="zi-mock-tag zi-mock-tag--post">POST</span><span class="zi-mock-path">/api/v2/merchant/cash-back</span></div>
 </div>
 </div>
 </div>

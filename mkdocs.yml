@@ -43,6 +43,16 @@ extra_css:
 extra_javascript:
   - https://unpkg.com/mermaid@10/dist/mermaid.min.js
 
+livereload:
+  port: 8000
+  watch:
+    - docs/
+    - overrides/
+    - site/
+    - mkdocs.yml
+    - requirements.txt
+    - README.md
+
 markdown_extensions:
   - admonition
   - pymdownx.details
